@@ -1,0 +1,134 @@
+/* Font -------------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* TODO */
+
+/* Layout ------------------------------------------------------------------ */
+/* Style for the header */
+header {
+    background-color: #333;
+    padding: 10px;
+    text-align: left;
+    
+}
+ 
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 10px;
+    padding: 8px 16px;
+    background: #555;
+    border-radius: 5px;
+    display: inline-block;
+    position: relative;
+    bottom: 20px;
+
+}
+
+nav a:hover {
+    background: #777;
+}
+
+/* Style for the footer */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* General Reset */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Header Styling */
+header {
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    padding: 20px 0;
+    background-color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    height: 30px;
+}
+
+/* Sign In Button */
+.signin-container {
+    margin-left: auto;
+}
+
+.signin-btn {
+    background-color: black;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s;
+    position: relative;
+    left: 600px;
+    bottom: 70px;
+}
+
+.signin-btn:hover {
+    background-color: gray;
+}
+
+/* Ensure top header (logo + sign-in button) is properly structured */
+.top-header {
+    display: flex;
+    justify-content: space-between; /* Logo on left, Sign In button on right */
+    align-items: center;
+    padding: 10px 20px;
+}
+
+/* Fix Sign In Button Position */
+.signin-container {
+    margin-left: auto; /* Push it to the right */
+}
+
+
+/* Store Logo */
+.logo img {
+    max-width: 78.47px;
+    height: 78.47px;
+    position: relative;
+    left: -685px;
+    bottom: 20px;
+}
+
+/* Centering the navigation */
+nav {
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    gap: 15px;  /* Space between buttons */
+    padding: 10px 0;
+}
+
+/* Button Styling */
+.nav-btn {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    border: 2px solid black;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: 120px;
+}
+
+/* Hover Effect */
+.nav-btn:hover {
+    background-color: black;
+    color: white;
+}
