@@ -5,6 +5,7 @@ session_start();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@ session_start();
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link rel="stylesheet" href="css/app.css"> <!-- Link to external CSS -->
 </head>
+
 <body>
 
     <!-- Header Section -->
@@ -22,10 +24,10 @@ session_start();
 
         <!-- Sign In Button -->
         <div class="signin-container">
-                <a href="signin.php" class="signin-btn">Sign In</a>
-            </div>
+            <a href="SignInPage.php" class="signin-btn">Sign In</a>
         </div>
-        
+        </div>
+
         <!-- Navigation Menu -->
         <nav>
             <a href="men.php" class="nav-btn">Men</a>
@@ -37,4 +39,5 @@ session_start();
     </header>
 
 </body>
+
 </html>
