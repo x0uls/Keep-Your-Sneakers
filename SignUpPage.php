@@ -1,32 +1,62 @@
 <?php
-include '_head.php';
+include '_head.php'; // Include header
+include 'db.php'; // Database connection
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $errors = [];
+
+    // Validate input
+    if (empty($username)) $errors[] = "Username is required.";
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
+    if (empty($password) || strlen($password) < 6) $errors[] = "Password must be at least 6 characters.";
+    if ($password !== $confirm_password) $errors[] = "Passwords do not match.";
+
+    if (empty($errors)) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert user into database
+        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $email, $hashed_password);
+
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "Signup successful! You can now log in.";
+            header("Location: SignInPage.php");
+            exit();
+        } else {
+            $errors[] = "Error: " . $stmt->error;
+        }
+
+        $stmt->close();
+    }
+
+    $conn->close();
+}
 ?>
 
 <div class="signup-container">
     <h2>Sign Up</h2>
-    <form action="process_signup.php" method="POST" id="signup-form">
-        <label for="name">Full Name</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+    <?php if (!empty($errors)) echo '<div class="error">' . implode('<br>', $errors) . '</div>'; ?>
+    <form id="signup-form" action="" method="POST">
+        <label>Username:</label>
+        <input type="text" name="username" id="username" required>
 
-        <label for="email">Email</label><br>
-        <input type="email" id="email" name="email" required><br>
-        <span id="email-error" class="error-message"></span><br>
+        <label>Email:</label>
+        <input type="email" name="email" id="email" required>
 
-        <label for="password">Password</label><br>
-        <input type="password" id="password" name="password" required><br>
-        <span id="password-error" class="error-message"></span><br>
+        <label>Password:</label>
+        <input type="password" name="password" id="password" required>
 
-        <label for="confirm_password">Confirm Password</label><br>
-        <input type="password" id="confirm_password" name="confirm_password" required><br>
-        <span id="confirm-password-error" class="error-message"></span><br>
+        <label>Confirm Password:</label>
+        <input type="password" name="confirm_password" id="confirm_password" required>
 
         <button type="submit">Sign Up</button>
     </form>
+    <p>Already have an account? <a href="SignInPage.php">Sign in here</a>.</p>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="js/signup.js"></script>
-
-<?php
-include '_foot.php';
+<?php include '_foot.php'; // Include footer 
 ?>
