@@ -21,13 +21,20 @@ if (session_status() == PHP_SESSION_NONE) {
     <!-- Header Section -->
     <header>
         <div class="logo">
-            <img src="images/store-logo.png" alt="Sneaker Store Logo">
+            <a href="index.php">
+                <img src="images/store-logo.png" alt="Sneaker Store Logo">
+            </a>
         </div>
 
         <!-- Sign In Button -->
         <div class="signin-container">
-            <a href="SignInPage.php" class="signin-btn">Sign In</a>
-        </div>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="dashboard.php" class="profile-link">
+                    <img src="images/profile-icon.png" alt="Profile" class="profile-icon">
+                </a>
+            <?php else: ?>
+                <a href="LogInPage.php" class="signin-btn">Sign In</a>
+            <?php endif; ?>
         </div>
 
         <!-- Navigation Menu -->

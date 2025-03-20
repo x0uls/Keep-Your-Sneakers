@@ -164,3 +164,30 @@ nav {
     }
 }
 
+.signin-container {
+    position: absolute;
+    top: 20px; /* Adjust to match your existing sign-in button position */
+    right: 20px; /* Keep it in the top-right */
+    display: flex;
+    align-items: center;
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-icon {
+    width: 40px; /* Adjust size */
+    height: 40px;
+    border-radius: 50%; /* Make it circular */
+    object-fit: cover; /* Ensures proper image scaling */
+    transition: 0.3s ease-in-out;
+}
+
+.profile-icon:hover {
+    opacity: 0.8; /* Slight hover effect */
+}
+
+
