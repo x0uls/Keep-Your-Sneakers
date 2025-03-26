@@ -3,40 +3,52 @@ session_start();
 include '_head.php';
 include 'db.php';
 
-// Restrict access to admins only
+// Check if admin is logged in
 if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit();
 }
 
-// Handle product addition
+// Handle Product Upload
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    $price = $_POST['price'];
-    $image = $_FILES['image']['name'];
+    $name = trim($_POST['name']);
+    $description = trim($_POST['description']);
+    $price = floatval($_POST['price']);
+    $category = trim($_POST['category']);
+    $stock = intval($_POST['stock']);
+    $created_at = date("Y-m-d H:i:s");
 
+    // Handle Image Upload
     $target_dir = "uploads/";
-    $target_file = $target_dir . basename($image);
-    move_uploaded_file($_FILES['image']['tmp_name'], $target_file);
+    $image_name = basename($_FILES["image"]["name"]);
+    $target_file = $target_dir . $image_name;
+    move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
 
-    $stmt = $conn->prepare("INSERT INTO products (name, description, price, image) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssds", $name, $description, $price, $target_file);
-    $stmt->execute();
+    // Insert into database
+    $stmt = $conn->prepare("INSERT INTO products (name, description, price, category, image, stock, created_at) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssdssis", $name, $description, $price, $category, $target_file, $stock, $created_at);
+
+    if ($stmt->execute()) {
+        echo "<p style='color: green;'>Product added successfully!</p>";
+    } else {
+        echo "<p style='color: red;'>Error adding product.</p>";
+    }
     $stmt->close();
 }
 
-// Handle product deletion
+// Handle Product Deletion
 if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
+    $id = intval($_GET['delete']);
     $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
     $stmt->bind_param("i", $id);
-    $stmt->execute();
+    if ($stmt->execute()) {
+        echo "<p style='color: green;'>Product deleted successfully!</p>";
+    } else {
+        echo "<p style='color: red;'>Error deleting product.</p>";
+    }
     $stmt->close();
 }
-
-// Fetch products
-$result = $conn->query("SELECT * FROM products");
 ?>
 
 <!DOCTYPE html>
@@ -46,43 +58,72 @@ $result = $conn->query("SELECT * FROM products");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="css/app.css">
 </head>
 
 <body>
+
     <h2>Admin Dashboard</h2>
+
+    <!-- Add Product Form -->
     <h3>Add Product</h3>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="text" name="name" placeholder="Product Name" required><br>
-        <textarea name="description" placeholder="Description" required></textarea><br>
-        <input type="number" step="0.01" name="price" placeholder="Price" required><br>
-        <input type="file" name="image" accept="image/*" required><br>
-        <button type="submit" name="add_product">Add Product</button>
+    <form method="post" enctype="multipart/form-data">
+        <label>Name:</label><br>
+        <input type="text" name="name" required><br>
+
+        <label>Description:</label><br>
+        <textarea name="description" required></textarea><br>
+
+        <label>Price:</label><br>
+        <input type="number" step="0.01" name="price" required><br>
+
+        <label>Category:</label><br>
+        <select name="category" required>
+            <option value="Men">Men</option>
+            <option value="Women">Women</option>
+            <option value="Kids">Kids</option>
+            <option value="Sales">Sales</option>
+        </select><br>
+
+        <label>Stock:</label><br>
+        <input type="number" name="stock" required><br>
+
+        <label>Image:</label><br>
+        <input type="file" name="image" required><br>
+
+        <input type="submit" name="add_product" value="Add Product">
     </form>
 
-    <h3>Existing Products</h3>
+    <!-- Display Products -->
+    <h3>Product List</h3>
     <table border="1">
         <tr>
-            <th>Image</th>
+            <th>ID</th>
             <th>Name</th>
             <th>Description</th>
             <th>Price</th>
-            <th>Action</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Image</th>
+            <th>Actions</th>
         </tr>
-        <?php while ($row = $result->fetch_assoc()) { ?>
-            <tr>
-                <td><img src="<?php echo $row['image']; ?>" width="50"></td>
-                <td><?php echo $row['name']; ?></td>
-                <td><?php echo $row['description']; ?></td>
-                <td>$<?php echo $row['price']; ?></td>
-                <td><a href="?delete=<?php echo $row['id']; ?>" onclick="return confirm('Delete this product?');">Delete</a></td>
-            </tr>
-        <?php } ?>
+        <?php
+        $result = $conn->query("SELECT * FROM products");
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>
+            <td>{$row['id']}</td>
+            <td>{$row['name']}</td>
+            <td>{$row['description']}</td>
+            <td>{$row['price']}</td>
+            <td>{$row['category']}</td>
+            <td>{$row['stock']}</td>
+            <td><img src='{$row['image']}' width='50'></td>
+            <td><a href='admin_dashboard.php?delete={$row['id']}'>Delete</a></td>
+        </tr>";
+        }
+        ?>
     </table>
+
 </body>
 
 </html>
-
-<?php
-$conn->close();
-?>
+<?php include '_foot.php'; ?>

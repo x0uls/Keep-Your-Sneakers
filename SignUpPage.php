@@ -1,5 +1,5 @@
 <?php
-include '_head.php'; // Include header
+include '_head.php';
 include 'db.php'; // Database connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -41,17 +41,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h2>Sign Up</h2>
     <?php if (!empty($errors)) echo '<div class="error">' . implode('<br>', $errors) . '</div>'; ?>
     <form id="signup-form" action="" method="POST">
-        <label>Username:</label>
-        <input type="text" name="username" id="username" required>
+        <label>Username:</label><br>
+        <input type="text" name="username" id="username" required><br>
 
-        <label>Email:</label>
-        <input type="email" name="email" id="email" required>
+        <label>Email:</label><br>
+        <input type="email" name="email" id="email" required><br>
 
-        <label>Password:</label>
-        <input type="password" name="password" id="password" required>
+        <label>Password:</label><br>
+        <input type="password" name="password" id="password" required><br>
 
-        <label>Confirm Password:</label>
-        <input type="password" name="confirm_password" id="confirm_password" required>
+        <label>Confirm Password:</label><br>
+        <input type="password" name="confirm_password" id="confirm_password" required><br><br>
 
         <button type="submit">Sign Up</button>
     </form>
