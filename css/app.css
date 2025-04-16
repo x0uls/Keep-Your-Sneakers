@@ -8,27 +8,42 @@
 /* Layout ------------------------------------------------------------------ */
 /* Style for the header */
 .header {
-    display: flex;
-    justify-content: space-between; /* Pushes logo to left, other elements to right */
-    align-items: center; /* Aligns everything in the same vertical line */
+    display: absolute;
+    justify-content: space-between;
+    /* Pushes logo to left, other elements to right */
+    align-items: center;
+    /* Aligns everything in the same vertical line */
     padding: 10px 20px;
 }
- 
-nav a {
-    color: white;
-    text-decoration: none;
-    margin: 10px;
-    padding: 8px 16px;
-    background: #555;
-    border-radius: 5px;
-    display: inline-block;
-    position: relative;
-    bottom: 20px;
 
+nav btn {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    background: none;
+    color: #333;
+    padding: 10px 30px;
+    border: none;
+    transition: color 0.3s ease;
+    position: relative;
+    bottom: 85px;
 }
 
-nav a:hover {
-    background: #777;
+/* Hover Effect */
+nav btn::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #333;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+btn:hover::after {
+    width: 100%;
+    left: 0;
 }
 
 /* Style for the footer */
@@ -42,7 +57,13 @@ footer {
 }
 
 /* General Reset */
-body, h1, h2, h3, p, ul, li {
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+li {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -71,10 +92,13 @@ header {
     border-radius: 5px;
     font-weight: bold;
     transition: 0.3s;
-    position: static; /* Reset positioning */
-    margin-left: auto; /* Push to the right if inside a flex container */
+    position: static;
+    /* Reset positioning */
+    margin-left: auto;
+    /* Push to the right if inside a flex container */
     display: inline-block;
 }
+
 .signin-btn:hover {
     background-color: gray;
 }
@@ -82,17 +106,18 @@ header {
 /* Ensure top header (logo + sign-in button) is properly structured */
 .top-header {
     display: flex;
-    justify-content: space-between; /* Logo on left, Sign In button on right */
+    justify-content: space-between;
+    /* Logo on left, Sign In button on right */
     align-items: center;
     padding: 10px 20px;
 }
 
 /* Store Logo */
 .logo img {
-    max-width: 78.47px;
-    height: 78.47px;
+    max-width: 70px;
+    max-height: 70px;
     position: relative;
-    margin-left: 1px;
+    margin-left: -1764px;
     bottom: 20px;
 }
 
@@ -101,7 +126,8 @@ nav {
     font-family: 'Montserrat', sans-serif;
     display: flex;
     justify-content: center;
-    gap: 15px;  /* Space between buttons */
+    gap: 15px;
+    /* Space between buttons */
     padding: 10px 0;
 }
 
@@ -110,20 +136,30 @@ nav {
     text-decoration: none;
     font-size: 18px;
     font-weight: bold;
-    background-color: white;
-    color: black;
-    padding: 10px 20px;
-    border: 2px solid black;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+    background: none;
+    color: #333;
+    padding: 10px 30px;
+    border: none;
+    transition: color 0.3s ease;
     position: relative;
-    bottom: 105px;
+    bottom: 85px;
 }
 
 /* Hover Effect */
-.nav-btn:hover {
-    background-color: black;
-    color: white;
+.nav-btn::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #333;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.btn:hover::after {
+    width: 100%;
+    left: 0;
 }
 
 .success-popup {
@@ -152,6 +188,7 @@ nav {
     from {
         transform: translate(-50%, -100%);
     }
+
     to {
         transform: translate(-50%, 0);
     }
@@ -159,8 +196,10 @@ nav {
 
 .signin-container {
     position: absolute;
-    top: 20px; /* Adjust to match your existing sign-in button position */
-    right: 20px; /* Keep it in the top-right */
+    top: 20px;
+    /* Adjust to match your existing sign-in button position */
+    right: 20px;
+    /* Keep it in the top-right */
     display: flex;
     align-items: center;
 }
@@ -172,15 +211,19 @@ nav {
 }
 
 .profile-icon {
-    width: 40px; /* Adjust size */
+    width: 40px;
+    /* Adjust size */
     height: 40px;
-    border-radius: 50%; /* Make it circular */
-    object-fit: cover; /* Ensures proper image scaling */
+    border-radius: 50%;
+    /* Make it circular */
+    object-fit: cover;
+    /* Ensures proper image scaling */
     transition: 0.3s ease-in-out;
 }
 
 .profile-icon:hover {
-    opacity: 0.8; /* Slight hover effect */
+    opacity: 0.8;
+    /* Slight hover effect */
 }
 
 .dropdown-content {
@@ -210,9 +253,11 @@ nav {
 /*Search Bar*/
 .search-form {
     position: absolute;
-    top: 10px;   /* Adjust this value to move it down */
-    right: 250px; /* Adjust this value to move it from the right */
-    display: flex;
+    top: 10px;
+    /* Adjust this value to move it down */
+    right: 250px;
+    /* Adjust this value to move it from the right */
+    display: absolute;
     align-items: center;
     background: white;
     border-radius: 20px;
@@ -239,39 +284,71 @@ nav {
     padding: 5px;
 }
 
+.search-form img {
+    max-width: 20px;
+    max-height: 20px;
+    margin-left: -30px;
+    margin-top: -3px;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
 
 /* Cart Dropdown Styling */
+.cart-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    /* Moves the cart to the right */
+    align-items: center;
+    height: 60px;
+    /* Adjust height if needed */
+    padding-right: 30px;
+    /* Adjust to move left or right */
+    background-color: #f8f9fa;
+    /* Example background */
+}
+
 .cart-dropdown {
     position: relative;
-    display: inline-block;
+    /* Ensures dropdown stays attached */
 }
 
 .cart-btn {
+    position: absolute;
     background: none;
     border: none;
     font-size: 18px;
     cursor: pointer;
-    position: relative;
     padding: 10px;
+    margin-left: 650px;
+    bottom: 95px;
 }
 
 /* Cart Count (Red Badge) */
 .cart-count {
     position: absolute;
     top: 5px;
-    right: -10px;
+    right: -8px;
     background-color: red;
     color: white;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
-    padding: 3px 6px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
+    padding: 0;
 }
 
 /* Dropdown Content */
 .cart-content {
     display: none;
     position: absolute;
+    top: 100%;
+    /* Places dropdown below the cart */
     right: 0;
     width: 250px;
     background: white;
@@ -286,38 +363,6 @@ nav {
     display: block;
 }
 
-/* Cart item styling */
-.cart-item {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding: 5px 0;
-}
-
-.cart-item img {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    border-radius: 5px;
-}
-
-.cart-footer {
-    text-align: center;
-    margin-top: 10px;
-}
-
-.cart-footer a {
-    display: block;
-    padding: 5px;
-    background-color: #28a745;
-    color: white;
-    text-decoration: none;
-    border-radius: 3px;
-}
-
-.cart-footer a:hover {
-    background-color: #218838;
-}
 
 table {
     width: 100%;
@@ -329,11 +374,6 @@ td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: center;
-}
-
-img {
-    width: 50px;
-    height: 50px;
 }
 
 .remove-btn {

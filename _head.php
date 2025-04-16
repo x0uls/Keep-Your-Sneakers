@@ -32,10 +32,10 @@ $total_items = count($cart_items);
 
         <!-- Navigation Menu -->
         <nav>
-            <a href="men.php" class="nav-btn">Men</a>
-            <a href="women.php" class="nav-btn">Women</a>
-            <a href="kids.php" class="nav-btn">Kids</a>
-            <a href="sales.php" class="nav-btn">Sales</a>
+            <btn href="men.php" class="nav-btn">Men</btn>
+            <btn href="women.php" class="nav-btn">Women</btn>
+            <btn href="kids.php" class="nav-btn">Kids</btn>
+            <btn href="sales.php" class="nav-btn">Sales</btn>
         </nav>
 
         <!-- Right-side container for Sign-in/Profile, Search Bar & Cart -->
@@ -61,7 +61,11 @@ $total_items = count($cart_items);
             <!-- Search Bar -->
             <form action="search.php" method="GET" class="search-form">
                 <input type="text" name="query" placeholder="Search for sneakers..." required>
-                <button type="submit">🔍</button>
+                <button type="submit">
+                    <div class="searchlogo">
+                        <img src="images/search.png" alt="Search">
+                    </div>
+                </button>
             </form>
 
             <!-- Cart Dropdown -->
