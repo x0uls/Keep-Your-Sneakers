@@ -61,7 +61,9 @@ $total_items = count($cart_items);
             <!-- Search Bar -->
             <form action="search.php" method="GET" class="search-form">
                 <input type="text" name="query" placeholder="Search for sneakers..." required>
-                <button type="submit">🔍</button>
+                <button type="submit">
+                    <img src="images/favicon.png" alt="Search" width="20" height="20">
+                </button>
             </form>
 
             <!-- Cart Dropdown -->
@@ -86,6 +88,7 @@ $total_items = count($cart_items);
                     <?php endif; ?>
                 </div>
             </div>
+
 
         </div>
 

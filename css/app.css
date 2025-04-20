@@ -239,20 +239,24 @@ nav {
     padding: 5px;
 }
 
+.search-form img {
+    max-width: 50px;
+    max-height: 50px;
+}
+
 
 /* Cart Dropdown Styling */
 .cart-dropdown {
-    position: relative;
-    display: inline-block;
+    position: relative; /* Ensures dropdown positions relative to this */
+    display: flex;
+    align-items: center;
 }
 
 .cart-btn {
     background: none;
     border: none;
-    font-size: 18px;
     cursor: pointer;
-    position: relative;
-    padding: 10px;
+    font-size: 1.5rem; /* Adjust size */
 }
 
 /* Cart Count (Red Badge) */
@@ -270,20 +274,20 @@ nav {
 
 /* Dropdown Content */
 .cart-content {
-    display: none;
     position: absolute;
-    right: 0;
-    width: 250px;
+    top: 100%; /* Makes it appear below the cart button */
+    right: 0; /* Aligns it to the right */
     background: white;
     border: 1px solid #ddd;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 250px; /* Adjust width */
     padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 100;
+    display: none; /* Hide by default */
 }
 
 /* Show dropdown when hovering */
 .cart-dropdown:hover .cart-content {
-    display: block;
+    display: block; /* Show when hovered */
 }
 
 /* Cart item styling */
@@ -389,6 +393,7 @@ img {
     height: auto;
 }
 
+/*search*/
 .product {
     border: 1px solid #ddd;
     padding: 10px;
