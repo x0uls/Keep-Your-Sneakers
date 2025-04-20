@@ -1,27 +1,32 @@
 <?php
 session_start();
+require_once 'db.php'; // adjust path if needed
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id = $_POST['id'];
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $image = $_POST['image'];
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['status' => 'error', 'message' => 'Not logged in']);
+    exit;
+}
 
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_SESSION['user_id'];
+    $product_id = $_POST['product_id'] ?? null;
 
-    // If item is already in cart, increase quantity
-    if (isset($_SESSION['cart'][$id])) {
-        $_SESSION['cart'][$id]['quantity'] += 1;
+    if ($product_id) {
+        $stmt = $conn->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, 1) 
+            ON DUPLICATE KEY UPDATE quantity = quantity + 1");
+        $stmt->bind_param("ii", $user_id, $product_id);
+
+        if ($stmt->execute()) {
+            echo json_encode(['status' => 'success']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'DB Error']);
+        }
+
+        $stmt->close();
     } else {
-        $_SESSION['cart'][$id] = [
-            'name' => $name,
-            'price' => $price,
-            'image' => $image,
-            'quantity' => 1
-        ];
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Missing product_id']);
     }
-
-    echo "Added to cart!";
 }

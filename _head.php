@@ -68,27 +68,11 @@ $total_items = count($cart_items);
                 </button>
             </form>
 
-            <!-- Cart Dropdown -->
-            <div class="cart-dropdown">
-                <button class="cart-btn">🛒 <span class="cart-count"><?php echo $total_items; ?></span></button>
-                <div class="cart-content">
-                    <?php if ($total_items > 0): ?>
-                        <?php foreach ($cart_items as $id => $item): ?>
-                            <div class="cart-item">
-                                <img src="<?php echo $item['image']; ?>" alt="Product">
-                                <div>
-                                    <p><?php echo $item['name']; ?></p>
-                                    <p>RM<?php echo $item['price']; ?></p>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                        <div class="cart-footer">
-                            <a href="cart.php">View Cart</a>
-                        </div>
-                    <?php else: ?>
-                        <p>Your cart is empty</p>
-                    <?php endif; ?>
-                </div>
+            <!-- _head.php -->
+            <div class="cart-button">
+                <a href="cart.php">
+                    <img src="images/cart.png" alt="Cart" class="class-button" />
+                </a>
             </div>
 
         </div>
