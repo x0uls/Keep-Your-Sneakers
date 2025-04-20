@@ -103,6 +103,12 @@ header {
     background-color: gray;
 }
 
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
 /* Ensure top header (logo + sign-in button) is properly structured */
 .top-header {
     display: flex;

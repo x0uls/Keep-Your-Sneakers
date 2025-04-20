@@ -42,11 +42,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <input type="text" id="email" name="email" required><br>
 
     <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br>
-
-    <a href="SignUpPage.php">No account? Sign Up here!</a><br><br>
+    <input type="password" id="password" name="password" required><br><br>
+    <a href="forgot_password.php">Forgot password?</a><br>
 
     <input type="submit" value="Login">
+
+    <p>New User? <a href="SignUpPage.php">Sign Up here!</a></p><br><br>
 </form>
 
 <?php

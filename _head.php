@@ -6,6 +6,26 @@ if (session_status() == PHP_SESSION_NONE) {
 // Get cart items (if any)
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 $total_items = count($cart_items);
+
+// Fetch user profile picture if logged in
+$profile_picture = 'default-profile-icon.png'; // Default profile picture
+if (isset($_SESSION['user_id'])) {
+    include 'db.php';
+    $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $stmt->bind_result($profile_picture);
+    $stmt->fetch();
+    $stmt->close();
+    $conn->close();
+
+    // If the user has a profile picture, use that
+    if ($profile_picture && file_exists('uploads/' . $profile_picture)) {
+        $profile_picture_path = 'uploads/' . $profile_picture;
+    } else {
+        $profile_picture_path = 'images/default-profile-icon.png'; // Fallback to default if no profile picture
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +66,7 @@ $total_items = count($cart_items);
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="profile-dropdown">
                         <a href="dashboard.php" class="profile-link">
-                            <img src="images/profile-icon.png" alt="Profile" class="profile-icon">
+                            <img src="<?php echo $profile_picture_path; ?>" alt="Profile" class="profile-icon">
                         </a>
                         <div class="dropdown-content">
                             <a href="dashboard.php">Profile</a>
@@ -68,10 +88,10 @@ $total_items = count($cart_items);
                 </button>
             </form>
 
-            <!-- _head.php -->
+            <!-- Cart Button -->
             <div class="cart-button">
                 <a href="cart.php">
-                    <img src="images/cart.png" alt="Cart" class="class-button" />
+                    <img src="images/cart.png" alt="Cart" style="width: 35px; height: 35px; position: fixed; top: 19px; right: 160px;" class="class-button" />
                 </a>
             </div>
 
