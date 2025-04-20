@@ -17,7 +17,6 @@ if (isset($_SESSION['user_id'])) {
     $stmt->bind_result($profile_picture);
     $stmt->fetch();
     $stmt->close();
-    $conn->close();
 
     // If the user has a profile picture, use that
     if ($profile_picture && file_exists('uploads/' . $profile_picture)) {

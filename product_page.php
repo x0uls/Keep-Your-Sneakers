@@ -57,10 +57,7 @@ if (isset($_GET['id'])) {
                     url: "add_to_cart.php",
                     type: "POST",
                     data: {
-                        id: productId,
-                        name: productName,
-                        price: productPrice,
-                        image: productImage
+                        product_id: productId, // ✅ now matches what PHP expects
                     },
                     success: function(response) {
                         alert("Added to cart!");
