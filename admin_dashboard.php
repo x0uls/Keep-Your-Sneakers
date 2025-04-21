@@ -141,7 +141,7 @@ $products = $pdo->query("
     <main>
         <div class="product-grid">
             <?php foreach ($products as $product): ?>
-                <a href="Admin_Product_Page.php?id=<?= $product['id'] ?>" class="product-card">
+                <a href="admin_product_page.php?id=<?= $product['id'] ?>" class="product-card">
                     <img src="uploads/<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
                     <div class="product-info">
                         <h3><?= htmlspecialchars($product['name']) ?></h3>

@@ -72,5 +72,5 @@ foreach ($new_sizes as $newSizeData) {
 $pdo->commit();
 
 // Redirect or display success message
-header("Location: Admin_Product_Page.php?id=" . $product_id);
+header("Location: admin_product_page.php?id=" . $product_id);
 exit();

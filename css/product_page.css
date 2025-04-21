@@ -1,7 +1,5 @@
 body {
     font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 20px;
     background: #fff;
 }
 
@@ -9,7 +7,8 @@ body {
     display: flex;
     gap: 50px;
     max-width: 1200px;
-    margin: auto;
+    margin: 0 auto;
+    margin-top: 30px;
 }
 
 .product-img {

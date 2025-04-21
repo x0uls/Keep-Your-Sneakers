@@ -93,7 +93,7 @@ if (isset($_SESSION['user_id'])) {
             <!-- Cart Button -->
             <div class="cart-button">
                 <a href="cart.php">
-                    <img src="images/cart.png" alt="Cart" style="width: 35px; height: 35px; position: fixed; top: 19px; right: 160px;" class="class-button" />
+                    <img src="images/cart.png" alt="Cart" style="width: 35px; height: 35px; position: absolute; top: 19px; right: 160px;" class="class-button" />
                 </a>
             </div>
 

@@ -1,4 +1,4 @@
 <footer>
-        Developed by <b>FOOT LOCKERS</b> &middot;
+        Developed by <b>NAIKI</b> &middot;
         Copyrighted &copy; <?= date('Y') ?>
 </footer>
