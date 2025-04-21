@@ -1,83 +1,92 @@
 $(document).ready(function () {
 
-    // ========== Live Total Price Update ==========
-    function calculateTotal() {
+    function updateTotals() {
         let total = 0;
 
         $('.item-checkbox').each(function () {
             if ($(this).is(':checked')) {
+                const row = $(this).closest('tr');
                 const price = parseFloat($(this).data('price'));
-                const quantity = parseInt($(this).closest('tr').find('.quantity-input').val());
-                total += price * quantity;
+                const qty = parseInt(row.find('.quantity-display').val(), 10);
+                total += price * qty;
             }
         });
 
         $('#totalPrice').text(total.toFixed(2));
     }
 
-    // ========== Add to Cart ==========
-    window.addToCart = function (productId) {
-        $.ajax({
-            url: "add_to_cart.php",
-            type: "POST",
-            data: { product_id: productId },
-            success: function (response) {
-                try {
-                    var data = JSON.parse(response);
-                    if (data.status === 'success') {
-                        alert('Added to cart!');
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                } catch (e) {
-                    alert('Unexpected error. Check console.');
-                    console.error(e, response);
-                }
-            }
-        });
-    };
+    // Handle + button
+    $(document).on('click', '.qty-plus', function () {
+        const wrapper = $(this).closest('.quantity-wrapper');
+        const display = wrapper.find('.quantity-display');
+        const minusBtn = wrapper.find('.qty-minus');
+        let qty = parseInt(display.val(), 10);
+        const max = parseInt(wrapper.data('max'), 10);
 
-    // Bind to dynamic "Add to cart" buttons
-    $(".add-to-cart").click(function () {
-        const productId = $(this).data("product-id");
-        if (productId) {
-            addToCart(productId);
+        if (qty < max) {
+            qty++;
+            display.val(qty);
+            minusBtn.text('−'); // Restore from trash if it was 1
         }
+
+        const row = wrapper.closest('tr');
+        const price = parseFloat(row.find('.item-checkbox').data('price'));
+        row.find('.item-total').text('RM' + (price * qty).toFixed(2));
+
+        updateTotals();
     });
 
-    // ========== Remove from Cart ==========
-    $(document).off("click", ".remove-btn").on("click", ".remove-btn", function (e) {
-        e.preventDefault();
-        const btn = $(this);
-        const productId = btn.data("id");
+    // Handle − / 🗑️ button
+    $(document).on('click', '.qty-minus', function () {
+        const wrapper = $(this).closest('.quantity-wrapper');
+        const display = wrapper.find('.quantity-display');
+        let qty = parseInt(display.val(), 10);
+        const productId = wrapper.data('product');
+        const sizeId = wrapper.data('size');
 
-        if (confirm("Remove this item from your cart?")) {
-            $.post("cart.php", { action: "remove", product_id: productId }, function (res) {
-                try {
-                    const result = res;
-                    if (result.success) {
-                        btn.closest("tr").remove();
-                        calculateTotal();
+        if (qty > 1) {
+            qty--;
+            display.val(qty);
+
+            // If new qty is 1, switch minus to 🗑️
+            if (qty === 1) {
+                $(this).text('🗑️');
+            }
+        } else {
+            // Remove item from cart via AJAX
+            if (confirm("Remove this item from your cart?")) {
+                $.post('cart.php', {
+                    action: 'remove',
+                    product_id: productId,
+                    size_id: sizeId
+                }, function (res) {
+                    if (res.success) {
+                        wrapper.closest('tr').remove();
+                        updateTotals();
 
                         if ($(".item-checkbox").length === 0) {
                             $("#cartContainer").html("<p>Your cart is empty.</p>");
                         }
                     } else {
-                        alert("Failed to remove item.");
+                        alert('Failed to remove item.');
                     }
-                } catch (err) {
-                    alert("Something went wrong.");
-                    console.error(err);
-                }
-            });
+                }, 'json');
+                return;
+            }
         }
+
+        const row = wrapper.closest('tr');
+        const price = parseFloat(row.find('.item-checkbox').data('price'));
+        row.find('.item-total').text('RM' + (price * qty).toFixed(2));
+
+        updateTotals();
     });
 
-    // Recalculate when quantity or checkbox changes
-    $(document).on('change', '.item-checkbox, .quantity-input', function () {
-        calculateTotal();
+    // Recalculate when checkbox is toggled
+    $(document).on('change', '.item-checkbox', function () {
+        updateTotals();
     });
 
-    // Initial run
-    calculateTotal();
+    // Initial total
+    updateTotals();
 });

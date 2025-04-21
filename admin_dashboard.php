@@ -1,100 +1,14 @@
 <?php
+// admin_dashboard.php
+
 include 'db.php';
-
-// Handle stock, price, and category update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product_id'])) {
-    $productId = $_POST['update_product_id'];
-    $newPrice = $_POST['price'];
-    $newCategory = $_POST['category'];  // New category selection
-
-    try {
-        $pdo->beginTransaction();
-
-        // Update price
-        $updatePrice = $pdo->prepare("UPDATE products SET price = ? WHERE id = ?");
-        $updatePrice->execute([$newPrice, $productId]);
-
-        // Update stock per size
-        if (isset($_POST['stock']) && is_array($_POST['stock'])) {
-            $updateStock = $pdo->prepare("UPDATE product_sizes SET stock = ? WHERE id = ?");
-            foreach ($_POST['stock'] as $ps_id => $qty) {
-                $updateStock->execute([$qty, $ps_id]);
-            }
-        }
-
-        // Add new sizes if needed
-        if (isset($_POST['new_sizes']) && is_array($_POST['new_sizes'])) {
-            $insertStock = $pdo->prepare("INSERT INTO product_sizes (product_id, size_id, stock) VALUES (?, ?, ?)");
-            foreach ($_POST['new_sizes'] as $sizeId => $stock) {
-                if ($stock > 0) {
-                    $insertStock->execute([$productId, $sizeId, $stock]);
-                }
-            }
-        }
-
-        // Handle category updates
-        if ($newCategory) {
-            // Check if the category is already associated
-            $categoryCheckStmt = $pdo->prepare("
-                SELECT * FROM product_categories WHERE product_id = ? AND category_id = ?
-            ");
-            $categoryCheckStmt->execute([$productId, $newCategory]);
-            $categoryExists = $categoryCheckStmt->fetchColumn();
-
-            if (!$categoryExists) {
-                // Insert category if it's not already associated
-                $insertCategoryStmt = $pdo->prepare("
-                    INSERT INTO product_categories (product_id, category_id) VALUES (?, ?)
-                ");
-                $insertCategoryStmt->execute([$productId, $newCategory]);
-            }
-        }
-
-        $pdo->commit();
-        $message = "Product updated successfully!";
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        $message = "Update failed: " . $e->getMessage();
-    }
-}
 
 // Fetch products
 $products = $pdo->query("
-    SELECT p.id, p.name, p.price, p.image
-    FROM products p
-    ORDER BY p.id DESC
+    SELECT id, name, price, image
+    FROM products
+    ORDER BY id DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch all available sizes
-$sizes = $pdo->query("SELECT id, size_label FROM sizes ORDER BY size_label")->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch all categories
-$categories = $pdo->query("SELECT id, name FROM categories ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch categories associated with each product
-$categoriesByProduct = [];
-$categoryAssoc = $pdo->query("
-    SELECT pc.product_id, c.id AS category_id, c.name AS category_name
-    FROM product_categories pc
-    JOIN categories c ON pc.category_id = c.id
-")->fetchAll(PDO::FETCH_ASSOC);
-
-foreach ($categoryAssoc as $category) {
-    $categoriesByProduct[$category['product_id']][] = $category;
-}
-
-// Fetch sizes with stock for each product
-$productSizes = $pdo->query("
-    SELECT ps.id AS ps_id, ps.product_id, ps.size_id, ps.stock, s.size_label
-    FROM product_sizes ps
-    JOIN sizes s ON ps.size_id = s.id
-    ORDER BY s.size_label
-")->fetchAll(PDO::FETCH_ASSOC);
-
-$sizesByProduct = [];
-foreach ($productSizes as $row) {
-    $sizesByProduct[$row['product_id']][] = $row;
-}
 ?>
 
 <!DOCTYPE html>
@@ -102,153 +16,141 @@ foreach ($productSizes as $row) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - Product Management</title>
+    <title>Admin Dashboard</title>
     <style>
-        table {
+        body {
+            margin: 0;
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #f5f5f5;
+            color: #111;
+        }
+
+        header {
+            background-color: #111;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            letter-spacing: 1px;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .product-card img {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
         }
 
-        th,
-        td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: left;
+        .product-info {
+            padding: 20px;
         }
 
-        .details {
-            display: none;
-            background: #f9f9f9;
+        .product-info h3 {
+            font-size: 1.1em;
+            margin: 0 0 10px;
         }
 
-        .update-btn {
-            float: right;
-            margin-top: 10px;
+        .product-info p {
+            margin: 0;
+            font-weight: bold;
+            color: #555;
         }
 
-        input[type='number'] {
+        .insert-button {
+            margin-bottom: 30px;
+            display: inline-block;
+            background: #111;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .insert-button:hover {
+            background: #333;
+        }
+
+        .floating-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
             width: 60px;
+            height: 60px;
+            background-color: #111;
+            color: white;
+            border-radius: 50%;
+            font-size: 36px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
 
-        tr.clickable {
-            cursor: pointer;
-            background: #f1f1f1;
+        .floating-button:hover {
+            background-color: #333;
+            transform: scale(1.05);
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
 
-    <h2>Admin Dashboard</h2>
+    <header>
+        <h1>Admin Dashboard</h1>
+    </header>
 
-    <?php if (isset($message)) echo "<p style='color: green;'>$message</p>"; ?>
+    <a href="insert_product.php" class="floating-button" title="Insert Product">+</a>
 
-    <a href="insert_product.php">+ Insert New Product</a>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Image</th>
-                <th>Price (Editable)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($products as $p): ?>
-                <tr class="clickable" data-target="#details-<?= $p['id'] ?>">
-                    <td><?= htmlspecialchars($p['name']) ?></td>
-                    <td><img src="uploads/<?= htmlspecialchars($p['image']) ?>" width="50"></td>
-                    <td>RM <input type="number" name="price" value="<?= $p['price'] ?>" data-pid="<?= $p['id'] ?>"></td>
-                </tr>
-                <tr class="details" id="details-<?= $p['id'] ?>">
-                    <td colspan="3">
-                        <form method="POST">
-                            <input type="hidden" name="update_product_id" value="<?= $p['id'] ?>">
-                            <input type="hidden" name="price" id="price-input-<?= $p['id'] ?>" value="<?= $p['price'] ?>">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>Size</th>
-                                        <th>Stock</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Editable Category Dropdown -->
-                                    <tr>
-                                        <td>
-                                            <!-- Category Dropdown -->
-                                            <select name="category" required>
-                                                <option value="">Select Category</option>
-                                                <?php foreach ($categories as $category): ?>
-                                                    <option value="<?= $category['id'] ?>"
-                                                        <?php if (in_array($category['id'], array_column($categoriesByProduct[$p['id']], 'category_id'))) echo 'selected'; ?>>
-                                                        <?= $category['name'] ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <!-- Size Dropdown -->
-                                            <select name="new_sizes[0]" required>
-                                                <option value="">Select Size</option>
-                                                <?php foreach ($sizes as $size): ?>
-                                                    <option value="<?= $size['id'] ?>"><?= $size['size_label'] ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <!-- Stock Input -->
-                                            <input type="number" name="new_sizes[0_stock]" value="0" min="0" placeholder="Stock">
-                                        </td>
-                                    </tr>
-
-                                    <?php if (!empty($sizesByProduct[$p['id']])): ?>
-                                        <?php foreach ($sizesByProduct[$p['id']] as $size): ?>
-                                            <tr>
-                                                <td>
-                                                    <!-- Display categories for this product -->
-                                                    <?php
-                                                    // Display all categories for this product
-                                                    if (isset($categoriesByProduct[$p['id']])) {
-                                                        echo implode(', ', array_column($categoriesByProduct[$p['id']], 'category_name'));
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td><?= htmlspecialchars($size['size_label']) ?></td>
-                                                <td>
-                                                    <input type="number" name="stock[<?= $size['ps_id'] ?>]" value="<?= $size['stock'] ?>" min="0">
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                            <button type="submit" class="update-btn">Update</button>
-                        </form>
-                    </td>
-                </tr>
+    <main>
+        <div class="product-grid">
+            <?php foreach ($products as $product): ?>
+                <a href="Admin_Product_Page.php?id=<?= $product['id'] ?>" class="product-card">
+                    <img src="uploads/<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+                    <div class="product-info">
+                        <h3><?= htmlspecialchars($product['name']) ?></h3>
+                        <p>RM <?= number_format($product['price'], 2) ?></p>
+                    </div>
+                </a>
             <?php endforeach; ?>
-        </tbody>
-    </table>
-
-    <script>
-        $(document).ready(function() {
-            $('.clickable').click(function() {
-                const target = $(this).data('target');
-                $(target).slideToggle();
-            });
-
-            // When price input changes, also update hidden input inside the form
-            $("input[name='price']").on('input', function() {
-                const productId = $(this).data('pid');
-                const value = $(this).val();
-                $('#price-input-' + productId).val(value);
-            });
-        });
-    </script>
+        </div>
+    </main>
 
 </body>
 

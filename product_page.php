@@ -12,17 +12,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category'])) {
     $category_data = $category_stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($category_data) {
-        $size_stmt = $pdo->prepare("SELECT s.size_label FROM sizes s
+        $size_stmt = $pdo->prepare("SELECT s.size_label, ps.stock FROM sizes s
                                     JOIN product_sizes ps ON s.id = ps.size_id
                                     WHERE s.category_id = :category_id AND ps.product_id = :product_id");
         $size_stmt->bindParam(':category_id', $category_data['id'], PDO::PARAM_INT);
         $size_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
         $size_stmt->execute();
-        $sizes = $size_stmt->fetchAll(PDO::FETCH_COLUMN);
+        $sizes = $size_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (!empty($sizes)) {
             foreach ($sizes as $size) {
-                echo '<button>' . htmlspecialchars($size) . '</button>';
+                echo '<button class="size-button" data-size="' . htmlspecialchars($size['size_label']) . '">'
+                    . htmlspecialchars($size['size_label']) . '</button>';
             }
         } else {
             echo '<p>No sizes available for this category.</p>';
@@ -55,20 +56,6 @@ if (isset($_GET['id'])) {
         $category_stmt->bindParam(':product_id', $id, PDO::PARAM_INT);
         $category_stmt->execute();
         $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $sizes = [];
-        if ($categories) {
-            $size_stmt = $pdo->prepare("
-                SELECT s.size_label, ps.stock, c.name AS category_name
-                FROM sizes s
-                JOIN product_sizes ps ON s.id = ps.size_id
-                JOIN categories c ON s.category_id = c.id
-                WHERE ps.product_id = :product_id
-            ");
-            $size_stmt->bindParam(':product_id', $id, PDO::PARAM_INT);
-            $size_stmt->execute();
-            $sizes = $size_stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
     } catch (PDOException $e) {
         die("Error: " . $e->getMessage());
     }
@@ -85,117 +72,16 @@ if (isset($_GET['id'])) {
     <title><?php echo htmlspecialchars($product['name']); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="/css/product_page.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #fff;
-        }
 
-        .product-container {
-            display: flex;
-            gap: 50px;
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        .product-img {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .product-img img {
-            max-width: 100%;
-            border-radius: 10px;
-        }
-
-        .product-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .product-info h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .product-info p {
-            font-size: 16px;
-            margin: 6px 0;
-        }
-
-        .price {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .add-to-cart {
-            background-color: #111;
-            color: #fff;
-            border: none;
-            padding: 15px 30px;
-            margin-top: 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 30px;
-            transition: background-color 0.3s ease;
-        }
-
-        .add-to-cart:hover {
-            background-color: #333;
-        }
-
-        .category-buttons {
-            margin-bottom: 20px;
-        }
-
-        .category-buttons button {
-            padding: 10px 20px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            background: #f9f9f9;
-        }
-
-        .category-buttons button.active {
-            background: #111;
-            color: #fff;
-        }
-
-        .size-selection {
-            margin-bottom: 20px;
-        }
-
-        .size-selection button {
-            padding: 10px 15px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            background: #f9f9f9;
-        }
-
-        .size-selection button:hover {
-            background: #eee;
-        }
-    </style>
 </head>
 
 <body>
 
     <div class="product-container">
         <div class="product-img">
-            <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+            <img src="/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
         </div>
 
         <div class="product-info">
@@ -203,31 +89,17 @@ if (isset($_GET['id'])) {
             <p class="price">RM<?php echo htmlspecialchars($product['price']); ?></p>
             <p><?php echo htmlspecialchars($product['description']); ?></p>
 
-            <div>
-                <h3>Available Sizes:</h3>
-                <?php
-                $grouped = [];
-                foreach ($sizes as $size) {
-                    $grouped[$size['category_name']][] = $size;
-                }
-
-                foreach ($grouped as $category_name => $category_sizes) {
-                    echo "<h4>$category_name</h4><ul>";
-                    foreach ($category_sizes as $s) {
-                        echo "<li>{$s['size_label']} (Stock: {$s['stock']})</li>";
-                    }
-                    echo "</ul>";
-                }
-                ?>
-            </div>
-
             <!-- Category Buttons -->
             <div class="category-buttons">
-                <button class="category-button" data-category="Men">Men</button>
-                <button class="category-button" data-category="Women">Women</button>
-                <button class="category-button" data-category="Kids">Kids</button>
+                <h3>Categories:</h3>
+                <?php foreach ($categories as $cat): ?>
+                    <button class="category-button" data-category="<?= htmlspecialchars($cat['name']) ?>">
+                        <?= htmlspecialchars($cat['name']) ?>
+                    </button>
+                <?php endforeach; ?>
             </div>
 
+            <!-- Size Selection -->
             <div class="size-selection">
                 <p><strong>Select Size:</strong></p>
                 <div id="sizes">
@@ -262,21 +134,59 @@ if (isset($_GET['id'])) {
                     },
                     success: function(response) {
                         $("#sizes").html(response);
+                    },
+                    error: function() {
+                        $("#sizes").html("<p>Unable to load sizes. Please try again.</p>");
                     }
                 });
             });
 
+            // Size selection
+            $(document).on("click", ".size-button", function() {
+                $(".size-button").removeClass("active");
+                $(this).addClass("active");
+            });
+
+
+            // Add to cart
             $(".add-to-cart").click(function() {
                 var productId = $(this).data("id");
+                var productName = $(this).data("name");
+                var productPrice = $(this).data("price");
+                var productImage = $(this).data("image");
+
+                var selectedCategory = $(".category-button.active").data("category");
+                var selectedSize = $(".size-button.active").data("size");
+
+                console.log("Product ID:", productId);
+                console.log("Category:", selectedCategory);
+                console.log("Size:", selectedSize);
+
+                if (!selectedCategory || !selectedSize) {
+                    alert("Please select a category and a size.");
+                    return;
+                }
 
                 $.ajax({
                     url: "add_to_cart.php",
                     type: "POST",
+                    dataType: "json",
                     data: {
                         product_id: productId,
+                        category: selectedCategory,
+                        size: selectedSize
                     },
                     success: function(response) {
-                        alert("Added to cart!");
+                        console.log("AJAX Success Response:", response);
+                        if (response.status === "success") {
+                            alert(response.message);
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("Something went wrong. Please try again.");
                     }
                 });
             });

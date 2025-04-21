@@ -6,14 +6,15 @@ require 'db.php';  // Ensure PDO connection is established at the beginning
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove') {
     header('Content-Type: application/json'); // Tell browser it's JSON
 
-    if (isset($_POST['product_id'], $_SESSION['user_id'])) {
+    if (isset($_POST['product_id'], $_POST['size_id'], $_SESSION['user_id'])) {
         $product_id = intval($_POST['product_id']);
+        $size_id = intval($_POST['size_id']);
         $user_id = $_SESSION['user_id'];
 
-        // Prepare and execute PDO statement to remove from cart
-        $stmt = $pdo->prepare("DELETE FROM cart WHERE user_id = :user_id AND product_id = :product_id");
-        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $stmt = $pdo->prepare("DELETE FROM cart WHERE user_id = :user_id AND product_id = :product_id AND size_id = :size_id");
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':product_id', $product_id);
+        $stmt->bindParam(':size_id', $size_id);
         $success = $stmt->execute();
 
         echo json_encode(['success' => $success]);
@@ -34,10 +35,15 @@ if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
 
     // Fetch cart items with PDO
-    $sql = "SELECT c.product_id, c.quantity, p.name, p.price, p.image, p.stock 
-            FROM cart c 
-            JOIN products p ON c.product_id = p.id 
-            WHERE c.user_id = :user_id";
+    $sql = "SELECT 
+            c.product_id, c.size_id, c.quantity, 
+            p.name, p.price, p.image, 
+            s.size_label, ps.stock 
+        FROM cart c
+        JOIN products p ON c.product_id = p.id
+        JOIN product_sizes ps ON ps.product_id = c.product_id AND ps.size_id = c.size_id
+        JOIN sizes s ON c.size_id = s.id
+        WHERE c.user_id = :user_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -80,25 +86,33 @@ if (isset($_SESSION['user_id'])) {
                     $item_total = $item['price'] * $item['quantity'];
                     $total_price += $item_total;
                     ?>
-                    <tr data-id="<?php echo $item['product_id']; ?>">
-                        <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">
-                            <input type="checkbox" class="item-checkbox" data-price="<?php echo $item['price']; ?>" value="<?php echo $item['product_id']; ?>" checked>
+                    <tr data-id="<?php echo $item['product_id']; ?>" data-size="<?php echo $item['size_id']; ?>">
+                        <td style="text-align: center;">
+                            <input type="checkbox" class="item-checkbox"
+                                data-price="<?php echo htmlspecialchars($item['price']); ?>"
+                                value="<?php echo $item['product_id'] . '-' . $item['size_id']; ?>" checked>
                         </td>
-                        <td style="border: 1px solid #ccc; padding: 8px;">
-                            <img src="<?php echo $item['image']; ?>" alt="Product" style="width: 80px;">
+                        <td><img src="/products/<?php echo htmlspecialchars($item['image']); ?>" alt="Product" style="width: 80px;"></td>
+                        <td>
+                            <?php echo htmlspecialchars($item['name']); ?><br>
+                            <small>Size: <?php echo htmlspecialchars($item['size_label']); ?></small>
                         </td>
-                        <td style="border: 1px solid #ccc; padding: 8px;"><?php echo $item['name']; ?></td>
-                        <td style="border: 1px solid #ccc; padding: 8px;">RM<?php echo number_format($item['price'], 2); ?></td>
-                        <td style="border: 1px solid #ccc; padding: 8px;">
-                            <input type="number" class="quantity-input" data-price="<?php echo $item['price']; ?>"
-                                value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock']; ?>" style="width: 60px;">
+                        <td>RM<?php echo number_format($item['price'], 2); ?></td>
+                        <td>
+                            <div class="quantity-wrapper"
+                                data-product="<?php echo $item['product_id']; ?>"
+                                data-size="<?php echo $item['size_id']; ?>"
+                                data-max="<?php echo $item['stock']; ?>">
+                                <button class="qty-minus"><?php echo $item['quantity'] > 1 ? '−' : '🗑️'; ?></button>
+                                <input type="text" class="quantity-display" value="<?php echo htmlspecialchars($item['quantity']); ?>" readonly>
+                                <button class="qty-plus">+</button>
+                            </div>
                         </td>
-                        <td style="border: 1px solid #ccc; padding: 8px;" class="item-total">
+                        <td class="item-total">
                             RM<?php echo number_format($item_total, 2); ?>
                         </td>
-                        <td style="border: 1px solid #ccc; padding: 8px;">
-                            <button class="remove-btn" data-id="<?php echo $item['product_id']; ?>">❌</button>
-                        </td>
+                        <td></td> <!-- blank cell where ❌ used to be -->
+
                     </tr>
                 <?php endforeach; ?>
             </table>
