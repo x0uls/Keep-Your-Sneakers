@@ -18,22 +18,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Insert user into database
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $email, $hashed_password);
+        try {
+            // Prepare and execute the PDO query
+            $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)");
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->bindParam(':password', $hashed_password, PDO::PARAM_STR);
 
-        if ($stmt->execute()) {
-            $_SESSION['success'] = "Signup successful! You can now log in.";
-            header("Location: LogInPage.php");
-            exit();
-        } else {
-            $errors[] = "Error: " . $stmt->error;
+            if ($stmt->execute()) {
+                $_SESSION['success'] = "Signup successful! You can now log in.";
+                header("Location: LogInPage.php");
+                exit();
+            } else {
+                $errors[] = "Error: Could not execute the query.";
+            }
+        } catch (PDOException $e) {
+            $errors[] = "Error: " . $e->getMessage();
         }
-
-        $stmt->close();
     }
 
-    $conn->close();
+    $conn = null; // Close PDO connection
 }
 ?>
 

@@ -4,13 +4,23 @@ require 'db.php'; // Database connection
 include '_head.php';
 
 if (isset($_GET['query'])) {
-    $search = $conn->real_escape_string($_GET['query']); // Prevent SQL injection
-    $sql = "SELECT * FROM products 
-            WHERE name LIKE '%$search%' 
-            OR description LIKE '%$search%' 
-            OR category LIKE '%$search%'";
+    $search = trim($_GET['query']); // Clean the search input
+    try {
+        $sql = "SELECT * FROM products 
+                WHERE name LIKE :search 
+                OR description LIKE :search 
+                OR category LIKE :search";
 
-    $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $searchTerm = "%" . $search . "%";
+        $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+        $result = null;
+    }
 } else {
     $result = null;
 }
@@ -30,8 +40,8 @@ if (isset($_GET['query'])) {
     <h2>Search Results</h2>
 
     <?php
-    if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
+    if ($result && count($result) > 0) {
+        foreach ($result as $row) {
             echo '<a href="product_page.php?id=' . $row['id'] . '" class="product">';
             echo '<img src="' . $row['image'] . '" alt="' . $row['name'] . '">';
             echo '<h3>' . $row['name'] . '</h3>';

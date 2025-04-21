@@ -1,26 +1,24 @@
 <?php
 session_start();
 include '_head.php';
-include 'db.php';
+include 'db.php'; // Include your db connection
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    $stmt = $conn->prepare("SELECT id, password, is_admin FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
+    // Use the PDO connection
+    $stmt = $pdo->prepare("SELECT id, password, is_admin FROM users WHERE email = ?");
+    $stmt->execute([$email]);
 
-    if ($stmt->num_rows == 0) {
+    if ($stmt->rowCount() == 0) {
         $error = "No account associated with this email address.";
     } else {
-        $stmt->bind_result($id, $hashed_password, $is_admin);
-        $stmt->fetch();
+        $user = $stmt->fetch();
 
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION['user_id'] = $id;
-            if ($is_admin) {
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            if ($user['is_admin']) {
                 $_SESSION['admin'] = true;
                 header("Location: admin_dashboard.php"); // Redirect admin users
             } else {
@@ -31,8 +29,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "Wrong password!";
         }
     }
-
-    $stmt->close();
 }
 ?>
 
@@ -56,4 +52,3 @@ if (isset($error)) {
 }
 
 include '_foot.php';
-?>

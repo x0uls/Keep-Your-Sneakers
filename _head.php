@@ -10,19 +10,22 @@ $total_items = count($cart_items);
 // Fetch user profile picture if logged in
 $profile_picture = 'default-profile-icon.png'; // Default profile picture
 if (isset($_SESSION['user_id'])) {
-    include 'db.php';
-    $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE id = ?");
-    $stmt->bind_param("i", $_SESSION['user_id']);
-    $stmt->execute();
-    $stmt->bind_result($profile_picture);
-    $stmt->fetch();
-    $stmt->close();
+    include 'db.php'; // Assuming db.php sets up the PDO connection as $pdo
+    try {
+        $stmt = $pdo->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
+        $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->execute();
+        $profile_picture = $stmt->fetchColumn();
 
-    // If the user has a profile picture, use that
-    if ($profile_picture && file_exists('uploads/' . $profile_picture)) {
-        $profile_picture_path = 'uploads/' . $profile_picture;
-    } else {
-        $profile_picture_path = 'images/default-profile-icon.png'; // Fallback to default if no profile picture
+        // If the user has a profile picture, use that
+        if ($profile_picture && file_exists('uploads/' . $profile_picture)) {
+            $profile_picture_path = 'uploads/' . $profile_picture;
+        } else {
+            $profile_picture_path = 'images/default-profile-icon.png'; // Fallback to default if no profile picture
+        }
+    } catch (PDOException $e) {
+        // If there is an error with the query, fall back to the default profile picture
+        $profile_picture_path = 'images/default-profile-icon.png';
     }
 }
 ?>

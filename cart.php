@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require 'db.php';  // Ensure PDO connection is established at the beginning
 
 // ✅ Handle AJAX remove request BEFORE any HTML or includes
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove') {
@@ -10,10 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $product_id = intval($_POST['product_id']);
         $user_id = $_SESSION['user_id'];
 
-        $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ? AND product_id = ?");
-        $stmt->bind_param("ii", $user_id, $product_id);
+        // Prepare and execute PDO statement to remove from cart
+        $stmt = $pdo->prepare("DELETE FROM cart WHERE user_id = :user_id AND product_id = :product_id");
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
         $success = $stmt->execute();
-        $stmt->close();
 
         echo json_encode(['success' => $success]);
         exit;
@@ -31,20 +32,20 @@ $cart_items = [];
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
+
+    // Fetch cart items with PDO
     $sql = "SELECT c.product_id, c.quantity, p.name, p.price, p.image, p.stock 
             FROM cart c 
             JOIN products p ON c.product_id = p.id 
-            WHERE c.user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
+            WHERE c.user_id = :user_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
-    $result = $stmt->get_result();
 
-    while ($row = $result->fetch_assoc()) {
+    // Fetch results and populate $cart_items
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $cart_items[] = $row;
     }
-
-    $stmt->close();
 }
 ?>
 

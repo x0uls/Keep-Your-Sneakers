@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require 'db.php';  // Ensure PDO connection is established at the beginning
 include '_head.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -13,22 +13,20 @@ $user_id = $_SESSION['user_id'];
 $total_price = 0;
 $cart_items = [];
 
-// Get items from DB cart
+// Get items from DB cart using PDO
 $sql = "SELECT c.product_id, c.quantity, p.name, p.price, p.image 
         FROM cart c 
         JOIN products p ON c.product_id = p.id 
-        WHERE c.user_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
+        WHERE c.user_id = :user_id";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
-$result = $stmt->get_result();
 
-while ($row = $result->fetch_assoc()) {
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $cart_items[] = $row;
     $total_price += $row['price'] * $row['quantity'];
 }
 
-$stmt->close();
 ?>
 
 <!DOCTYPE html>

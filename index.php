@@ -19,7 +19,8 @@ session_start();
                 $(".success-popup").slideDown().delay(5000).slideUp();
             });
         </script>
-        <?php unset($_SESSION['signup_success']); // Clear message after displaying 
+        <?php
+        unset($_SESSION['signup_success']); // Clear message after displaying 
         ?>
     <?php endif; ?>
 

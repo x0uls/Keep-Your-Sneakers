@@ -14,33 +14,34 @@ require 'lib/Exception.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Fetch user details including profile picture
-$stmt = $conn->prepare("SELECT username, email, profile_picture FROM users WHERE id = ?");
-$stmt->bind_param("i", $_SESSION['user_id']);
+// Fetch user details including profile picture using PDO
+$stmt = $pdo->prepare("SELECT username, email, profile_picture FROM users WHERE id = :id");
+$stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
-$stmt->bind_result($username, $email, $profile_picture);
-$stmt->fetch();
-$stmt->close();  // Close after fetching the details
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->closeCursor();  // Close cursor after fetching the details
 
 // Handle the password change request
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
     $email = trim($_POST['email']);
     $errors = [];
 
-    // Check if email exists in the database
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    // Check if email exists in the database using PDO
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
     $stmt->execute();
-    $result = $stmt->get_result();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user = $result->fetch_assoc()) {
+    if ($user) {
         // Generate token using sha1(uniqid() . rand())
         $token = sha1(uniqid(rand(), true));  // Token generation
         $expires_at = date('Y-m-d H:i:s', strtotime('+5 minutes'));  // Token expiry time (5 minutes from now)
 
         // Insert token into the database with token_type 'change'
-        $stmt = $conn->prepare("INSERT INTO tokens (user_id, token, token_type, expires_at) VALUES (?, ?, 'reset', ?)");
-        $stmt->bind_param("iss", $user['id'], $token, $expires_at);
+        $stmt = $pdo->prepare("INSERT INTO tokens (user_id, token, token_type, expires_at) VALUES (:user_id, :token, 'reset', :expires_at)");
+        $stmt->bindParam(':user_id', $user['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt->bindParam(':expires_at', $expires_at, PDO::PARAM_STR);
         $stmt->execute();
 
         // Prepare the change password link
@@ -93,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
 <div style="text-align: center;">
     <?php
     // Check if there is a profile picture, if not, set default image
-    $profile_picture_path = $profile_picture ? "uploads/" . htmlspecialchars($profile_picture) : "images/default-profile-icon.png";
+    $profile_picture_path = $user['profile_picture'] ? "uploads/" . htmlspecialchars($user['profile_picture']) : "images/default-profile-icon.png";
     ?>
     <img src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" width="150" height="150" style="border-radius: 50%;"><br><br>
 
@@ -106,10 +107,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
 
 <form method="POST">
     <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" readonly><br>
+    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" readonly><br>
 
     <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" readonly><br>
+    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly><br>
 
     <!-- Change Password Section -->
     <button type="submit" name="change_password">Change Password</button><br><br>
@@ -120,6 +121,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
 <?php include '_foot.php'; ?>
 
 <?php
-// Close the connection after all queries have been executed
-$conn->close();
+// No need to manually close PDO connection, it's closed automatically at the end of script execution
 ?>

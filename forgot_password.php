@@ -14,20 +14,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST['email']);
     $errors = [];
 
-    // Check if email exists in the database
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
+    // Check if email exists in the database using PDO
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
     $stmt->execute();
-    $result = $stmt->get_result();
 
-    if ($user = $result->fetch_assoc()) {
+    if ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
         // Generate token using sha1(uniqid() . rand())
         $token = sha1(uniqid(rand(), true));  // Token generation
         $expires_at = date('Y-m-d H:i:s', strtotime('+5 minutes'));  // Token expiry time (5 minutes from now)
 
-        // Insert token into the database
-        $stmt = $conn->prepare("INSERT INTO tokens (user_id, token, token_type, expires_at) VALUES (?, ?, 'reset', ?)");
-        $stmt->bind_param("iss", $user['id'], $token, $expires_at);
+        // Insert token into the database using PDO
+        $stmt = $pdo->prepare("INSERT INTO tokens (user_id, token, token_type, expires_at) VALUES (:user_id, :token, 'reset', :expires_at)");
+        $stmt->bindParam(':user_id', $user['id'], PDO::PARAM_INT);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt->bindParam(':expires_at', $expires_at, PDO::PARAM_STR);
         $stmt->execute();
 
         // Prepare the password reset link

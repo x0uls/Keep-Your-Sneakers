@@ -1,129 +1,104 @@
-<?php
-session_start();
-include '_head.php';
-include 'db.php';
-
-// Check if admin is logged in
-if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
-    header("Location: login.php");
-    exit();
-}
-
-// Handle Product Upload
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
-    $name = trim($_POST['name']);
-    $description = trim($_POST['description']);
-    $price = floatval($_POST['price']);
-    $category = trim($_POST['category']);
-    $stock = intval($_POST['stock']);
-    $created_at = date("Y-m-d H:i:s");
-
-    // Handle Image Upload
-    $target_dir = "uploads/";
-    $image_name = basename($_FILES["image"]["name"]);
-    $target_file = $target_dir . $image_name;
-    move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
-
-    // Insert into database
-    $stmt = $conn->prepare("INSERT INTO products (name, description, price, category, image, stock, created_at) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssdssis", $name, $description, $price, $category, $target_file, $stock, $created_at);
-
-    if ($stmt->execute()) {
-        echo "<p style='color: green;'>Product added successfully!</p>";
-    } else {
-        echo "<p style='color: red;'>Error adding product.</p>";
-    }
-    $stmt->close();
-}
-
-// Handle Product Deletion
-if (isset($_GET['delete'])) {
-    $id = intval($_GET['delete']);
-    $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    if ($stmt->execute()) {
-        echo "<p style='color: green;'>Product deleted successfully!</p>";
-    } else {
-        echo "<p style='color: red;'>Error deleting product.</p>";
-    }
-    $stmt->close();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
+    <div class="dashboard-container">
+        <h2>Admin Dashboard</h2>
+        <h3>Add Product</h3>
 
-    <h2>Admin Dashboard</h2>
+        <form method="POST" enctype="multipart/form-data" action="admin_insert.php">
+            <label>Name:</label>
+            <input type="text" name="name" required />
 
-    <!-- Add Product Form -->
-    <h3>Add Product</h3>
-    <form method="post" enctype="multipart/form-data">
-        <label>Name:</label><br>
-        <input type="text" name="name" required><br>
+            <label>Description:</label>
+            <textarea name="description" required></textarea>
 
-        <label>Description:</label><br>
-        <textarea name="description" required></textarea><br>
+            <label>Price:</label>
+            <input type="number" step="0.01" name="price" required />
 
-        <label>Price:</label><br>
-        <input type="number" step="0.01" name="price" required><br>
+            <label>Image:</label>
+            <input type="file" name="image" required />
 
-        <label>Category:</label><br>
-        <select name="category" required>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-            <option value="Kids">Kids</option>
-            <option value="Sales">Sales</option>
-        </select><br>
+            <label>Categories:</label>
+            <div class="checkbox-group">
+                <div>
+                    <label><input type="checkbox" name="categories[]" value="1" class="category-toggle" data-target="#sizes-men" /> Men</label>
+                    <div id="sizes-men" class="category-section sizes-group">
+                        <h4>Men Sizes</h4>
+                        <div class="size-row">UK 6 <input type="number" name="sizes[Men][UK 6]" min="0" /></div>
+                        <div class="size-row">UK 6.5 <input type="number" name="sizes[Men][UK 6.5]" min="0" /></div>
+                        <div class="size-row">UK 7 <input type="number" name="sizes[Men][UK 7]" min="0" /></div>
+                        <div class="size-row">UK 7.5 <input type="number" name="sizes[Men][UK 7.5]" min="0" /></div>
+                        <div class="size-row">UK 8 <input type="number" name="sizes[Men][UK 8]" min="0" /></div>
+                        <div class="size-row">UK 8.5 <input type="number" name="sizes[Men][UK 8.5]" min="0" /></div>
+                        <div class="size-row">UK 9 <input type="number" name="sizes[Men][UK 9]" min="0" /></div>
+                        <div class="size-row">UK 9.5 <input type="number" name="sizes[Men][UK 9.5]" min="0" /></div>
+                        <div class="size-row">UK 10 <input type="number" name="sizes[Men][UK 10]" min="0" /></div>
+                        <div class="size-row">UK 10.5 <input type="number" name="sizes[Men][UK 10.5]" min="0" /></div>
+                        <div class="size-row">UK 11 <input type="number" name="sizes[Men][UK 11]" min="0" /></div>
+                        <div class="size-row">UK 12 <input type="number" name="sizes[Men][UK 12]" min="0" /></div>
+                    </div>
+                </div>
 
-        <label>Stock:</label><br>
-        <input type="number" name="stock" required><br>
+                <div>
+                    <label><input type="checkbox" name="categories[]" value="2" class="category-toggle" data-target="#sizes-women" /> Women</label>
+                    <div id="sizes-women" class="category-section sizes-group">
+                        <h4>Women Sizes</h4>
+                        <div class="size-row">UK 2.5 <input type="number" name="sizes[Women][UK 2.5]" min="0" /></div>
+                        <div class="size-row">UK 3 <input type="number" name="sizes[Women][UK 3]" min="0" /></div>
+                        <div class="size-row">UK 3.5 <input type="number" name="sizes[Women][UK 3.5]" min="0" /></div>
+                        <div class="size-row">UK 4 <input type="number" name="sizes[Women][UK 4]" min="0" /></div>
+                        <div class="size-row">UK 4.5 <input type="number" name="sizes[Women][UK 4.5]" min="0" /></div>
+                        <div class="size-row">UK 5 <input type="number" name="sizes[Women][UK 5]" min="0" /></div>
+                        <div class="size-row">UK 5.5 <input type="number" name="sizes[Women][UK 5.5]" min="0" /></div>
+                        <div class="size-row">UK 6 <input type="number" name="sizes[Women][UK 6]" min="0" /></div>
+                        <div class="size-row">UK 6.5 <input type="number" name="sizes[Women][UK 6.5]" min="0" /></div>
+                        <div class="size-row">UK 7 <input type="number" name="sizes[Women][UK 7]" min="0" /></div>
+                        <div class="size-row">UK 7.5 <input type="number" name="sizes[Women][UK 7.5]" min="0" /></div>
+                    </div>
+                </div>
 
-        <label>Image:</label><br>
-        <input type="file" name="image" required><br>
+                <div>
+                    <label><input type="checkbox" name="categories[]" value="3" class="category-toggle" data-target="#sizes-kids" /> Kids</label>
+                    <div id="sizes-kids" class="category-section sizes-group">
+                        <h4>Kids Sizes</h4>
+                        <div class="size-row">UK 3 <input type="number" name="sizes[Kids][UK 3]" min="0" /></div>
+                        <div class="size-row">UK 3.5 <input type="number" name="sizes[Kids][UK 3.5]" min="0" /></div>
+                        <div class="size-row">UK 4 <input type="number" name="sizes[Kids][UK 4]" min="0" /></div>
+                        <div class="size-row">UK 4.5 <input type="number" name="sizes[Kids][UK 4.5]" min="0" /></div>
+                        <div class="size-row">UK 5 <input type="number" name="sizes[Kids][UK 5]" min="0" /></div>
+                        <div class="size-row">UK 5.5 <input type="number" name="sizes[Kids][UK 5.5]" min="0" /></div>
+                        <div class="size-row">UK 6 (EU 39) <input type="number" name="sizes[Kids][UK 6 (EU 39)]" min="0" /></div>
+                        <div class="size-row">UK 6 (EU 40) <input type="number" name="sizes[Kids][UK 6 (EU 40)]" min="0" /></div>
+                    </div>
+                </div>
+            </div>
 
-        <input type="submit" name="add_product" value="Add Product">
-    </form>
+            <input type="submit" value="Add Product" />
+        </form>
+    </div>
 
-    <!-- Display Products -->
-    <h3>Product List</h3>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Category</th>
-            <th>Stock</th>
-            <th>Image</th>
-            <th>Actions</th>
-        </tr>
-        <?php
-        $result = $conn->query("SELECT * FROM products");
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>
-            <td>{$row['id']}</td>
-            <td>{$row['name']}</td>
-            <td>{$row['description']}</td>
-            <td>{$row['price']}</td>
-            <td>{$row['category']}</td>
-            <td>{$row['stock']}</td>
-            <td><img src='{$row['image']}' width='50'></td>
-            <td><a href='admin_dashboard.php?delete={$row['id']}'>Delete</a></td>
-        </tr>";
-        }
-        ?>
-    </table>
-
+    <script>
+        $(document).ready(function() {
+            $('.category-toggle').on('change', function() {
+                const target = $($(this).data('target'));
+                if ($(this).is(':checked')) {
+                    target.slideDown();
+                } else {
+                    target.slideUp();
+                    target.find('input[type=number]').val('');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
-<?php include '_foot.php'; ?>

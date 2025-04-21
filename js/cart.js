@@ -1,15 +1,4 @@
 $(document).ready(function () {
-    // ========== Update Cart Count ==========
-    function updateCartCount() {
-        $.ajax({
-            url: "cart_action.php",
-            type: "POST",
-            data: { action: "count" },
-            success: function (count) {
-                $(".cart-count").text(count);
-            }
-        });
-    }
 
     // ========== Live Total Price Update ==========
     function calculateTotal() {
@@ -37,7 +26,6 @@ $(document).ready(function () {
                     var data = JSON.parse(response);
                     if (data.status === 'success') {
                         alert('Added to cart!');
-                        updateCartCount();
                     } else {
                         alert('Error: ' + data.message);
                     }
@@ -66,11 +54,10 @@ $(document).ready(function () {
         if (confirm("Remove this item from your cart?")) {
             $.post("cart.php", { action: "remove", product_id: productId }, function (res) {
                 try {
-                    const result = JSON.parse(res);
+                    const result = res;
                     if (result.success) {
                         btn.closest("tr").remove();
                         calculateTotal();
-                        updateCartCount();
 
                         if ($(".item-checkbox").length === 0) {
                             $("#cartContainer").html("<p>Your cart is empty.</p>");
@@ -92,6 +79,5 @@ $(document).ready(function () {
     });
 
     // Initial run
-    updateCartCount();
     calculateTotal();
 });

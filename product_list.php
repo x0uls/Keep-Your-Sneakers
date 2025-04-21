@@ -2,9 +2,14 @@
 session_start();
 include 'db.php';
 
-// Fetch products
-$sql = "SELECT * FROM products";
-$result = $conn->query($sql);
+// Fetch products using PDO
+try {
+    $stmt = $conn->prepare("SELECT * FROM products");
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +26,7 @@ $result = $conn->query($sql);
     <h2>Our Products</h2>
 
     <div class="product-container">
-        <?php while ($row = $result->fetch_assoc()) : ?>
+        <?php foreach ($result as $row) : ?>
             <div class="product-card">
                 <img src="<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['name']) ?>">
                 <h3><?= htmlspecialchars($row['name']) ?></h3>
@@ -30,7 +35,7 @@ $result = $conn->query($sql);
                 <p><strong>Stock:</strong> <?= $row['stock'] > 0 ? "In Stock" : "Out of Stock" ?></p>
                 <button>Add to Cart</button>
             </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </div>
 
 </body>

@@ -5,4 +5,4 @@ session_destroy(); // Destroy the session
 
 // Redirect to the main page after logout
 header("Location: index.php");
-exit();
+exit(); // Make sure no further code is executed after the redirect

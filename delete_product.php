@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db.php';
+include 'db.php'; // Ensure this file includes your PDO connection
 
 if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
     header("Location: LogInPage.php");
@@ -10,21 +10,20 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'];
 
-    // Get image path before deleting
-    $stmt = $conn->prepare("SELECT image FROM products WHERE id = ?");
-    $stmt->bind_param("i", $id);
+    // Get image path before deleting using PDO
+    $stmt = $pdo->prepare("SELECT image FROM products WHERE id = :id");
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
-    $stmt->bind_result($image);
-    $stmt->fetch();
-    $stmt->close();
+    $image = $stmt->fetchColumn(); // Fetch the image column directly
+    $stmt->closeCursor(); // Close cursor
 
-    // Delete product from database
-    $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
-    $stmt->bind_param("i", $id);
+    // Delete product from database using PDO
+    $stmt = $pdo->prepare("DELETE FROM products WHERE id = :id");
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
-    $stmt->close();
+    $stmt->closeCursor();
 
-    // Delete image file
+    // Delete image file if it exists
     if (file_exists($image)) {
         unlink($image);
     }
