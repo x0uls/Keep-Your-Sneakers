@@ -7,11 +7,9 @@ if (isset($_GET['query'])) {
     $search = trim($_GET['query']); // Clean the search input
     try {
         $sql = "SELECT * FROM products 
-                WHERE name LIKE :search 
-                OR description LIKE :search 
-                OR category LIKE :search";
+                WHERE name LIKE :search";
 
-        $stmt = $conn->prepare($sql);
+        $stmt = $pdo->prepare($sql);
         $searchTerm = "%" . $search . "%";
         $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
         $stmt->execute();
