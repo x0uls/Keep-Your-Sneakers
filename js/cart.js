@@ -3,15 +3,14 @@ $(document).ready(function () {
     function updateTotals() {
         let total = 0;
 
-        $('.item-checkbox').each(function () {
-            if ($(this).is(':checked')) {
-                const row = $(this).closest('tr');
-                const price = parseFloat($(this).data('price'));
-                const qty = parseInt(row.find('.quantity-display').val(), 10);
-                total += price * qty;
-            }
+        // Iterate over all cart items (based on the class .cart-item)
+        $('.cart-item').each(function () {
+            const price = parseFloat($(this).find('.cart-item-price p').text().replace('RM', ''));
+            const qty = parseInt($(this).find('.quantity-display').val(), 10);
+            total += price * qty;
         });
 
+        // Update total price display
         $('#totalPrice').text(total.toFixed(2));
     }
 
@@ -29,11 +28,12 @@ $(document).ready(function () {
             minusBtn.text('−'); // Restore from trash if it was 1
         }
 
-        const row = wrapper.closest('tr');
-        const price = parseFloat(row.find('.item-checkbox').data('price'));
-        row.find('.item-total').text('RM' + (price * qty).toFixed(2));
+        // Update item total price
+        const row = wrapper.closest('.cart-item');
+        const price = parseFloat(row.find('.cart-item-price p').text().replace('RM', ''));
+        row.find('.cart-item-total p').text('RM' + (price * qty).toFixed(2));
 
-        updateTotals();
+        updateTotals(); // Recalculate total price
     });
 
     // Handle − / 🗑️ button
@@ -61,10 +61,10 @@ $(document).ready(function () {
                     size_id: sizeId
                 }, function (res) {
                     if (res.success) {
-                        wrapper.closest('tr').remove();
+                        wrapper.closest('.cart-item').remove();
                         updateTotals();
 
-                        if ($(".item-checkbox").length === 0) {
+                        if ($(".cart-item").length === 0) {
                             $("#cartContainer").html("<p>Your cart is empty.</p>");
                         }
                     } else {
@@ -75,18 +75,15 @@ $(document).ready(function () {
             }
         }
 
-        const row = wrapper.closest('tr');
-        const price = parseFloat(row.find('.item-checkbox').data('price'));
-        row.find('.item-total').text('RM' + (price * qty).toFixed(2));
+        // Update item total price
+        const row = wrapper.closest('.cart-item');
+        const price = parseFloat(row.find('.cart-item-price p').text().replace('RM', ''));
+        row.find('.cart-item-total p').text('RM' + (price * qty).toFixed(2));
 
-        updateTotals();
-    });
-
-    // Recalculate when checkbox is toggled
-    $(document).on('change', '.item-checkbox', function () {
-        updateTotals();
+        updateTotals(); // Recalculate total price
     });
 
     // Initial total
     updateTotals();
+
 });

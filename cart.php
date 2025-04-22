@@ -62,43 +62,146 @@ if (isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <title>Shopping Cart</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        #cartContainer {
+            font-family: 'Poppins', sans-serif;
+            color: #111;
+            background-color: #f5f5f5;
+            padding: 40px 20px;
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+            margin-top: 30px;
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #cartItems {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 10px 0;
+        }
+
+        .cart-item-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .cart-item-info img {
+            border-radius: 12px;
+        }
+
+        .cart-item-info h4 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .cart-item-price,
+        .cart-item-quantity,
+        .cart-item-total {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item-quantity {
+            gap: 10px;
+        }
+
+        .quantity-wrapper button {
+            background: #111;
+            color: white;
+            border: none;
+            width: 34px;
+            height: 34px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .quantity-wrapper button:hover {
+            background: #333;
+        }
+
+        .quantity-display {
+            border: none;
+            background: transparent;
+            width: 30px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        #checkoutBtn {
+            display: inline-block;
+            background: #111;
+            color: white;
+            padding: 14px 28px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        #checkoutBtn:hover {
+            background: #333;
+        }
+
+        @media (max-width: 768px) {
+            #cartItems {
+                flex-direction: column;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
-
-    <h2>Shopping Cart</h2>
-
     <div id="cartContainer">
+        <h2>Shopping Cart</h2>
         <?php if (!empty($cart_items)): ?>
-            <table style="border-collapse: collapse; width: 100%;" id="cartTable">
-                <tr>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Select</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Image</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Name</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Price</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Quantity</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Total</th>
-                    <th style="border: 1px solid #ccc; padding: 8px;">Action</th>
-                </tr>
-
+            <div id="cartItems">
                 <?php foreach ($cart_items as $item): ?>
                     <?php
                     $item_total = $item['price'] * $item['quantity'];
                     $total_price += $item_total;
                     ?>
-                    <tr data-id="<?php echo $item['product_id']; ?>" data-size="<?php echo $item['size_id']; ?>">
-                        <td style="text-align: center;">
-                            <input type="checkbox" class="item-checkbox"
-                                data-price="<?php echo htmlspecialchars($item['price']); ?>"
-                                value="<?php echo $item['product_id'] . '-' . $item['size_id']; ?>" checked>
-                        </td>
-                        <td><img src="/products/<?php echo htmlspecialchars($item['image']); ?>" alt="Product" style="width: 80px;"></td>
-                        <td>
-                            <?php echo htmlspecialchars($item['name']); ?><br>
-                            <small>Size: <?php echo htmlspecialchars($item['size_label']); ?></small>
-                        </td>
-                        <td>RM<?php echo number_format($item['price'], 2); ?></td>
-                        <td>
+                    <div class="cart-item" data-id="<?php echo $item['product_id']; ?>" data-size="<?php echo $item['size_id']; ?>">
+                        <div class="cart-item-info">
+                            <img src="/products/<?php echo htmlspecialchars($item['image']); ?>" alt="Product" style="width: 80px;">
+                            <div>
+                                <h4><?php echo htmlspecialchars($item['name']); ?></h4>
+                                <small>Size: <?php echo htmlspecialchars($item['size_label']); ?></small>
+                            </div>
+                        </div>
+                        <div class="cart-item-price">
+                            <p>RM<?php echo number_format($item['price'], 2); ?></p>
+                        </div>
+                        <div class="cart-item-quantity">
                             <div class="quantity-wrapper"
                                 data-product="<?php echo $item['product_id']; ?>"
                                 data-size="<?php echo $item['size_id']; ?>"
@@ -107,15 +210,13 @@ if (isset($_SESSION['user_id'])) {
                                 <input type="text" class="quantity-display" value="<?php echo htmlspecialchars($item['quantity']); ?>" readonly>
                                 <button class="qty-plus">+</button>
                             </div>
-                        </td>
-                        <td class="item-total">
-                            RM<?php echo number_format($item_total, 2); ?>
-                        </td>
-                        <td></td> <!-- blank cell where ❌ used to be -->
-
-                    </tr>
+                        </div>
+                        <div class="cart-item-total">
+                            <p>RM<?php echo number_format($item_total, 2); ?></p>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
-            </table>
+            </div>
 
             <h3>Total Price: RM<span id="totalPrice"><?php echo number_format($total_price, 2); ?></span></h3>
 
@@ -124,6 +225,7 @@ if (isset($_SESSION['user_id'])) {
             <p>Your cart is empty.</p>
         <?php endif; ?>
     </div>
+
 
     <script src="js/cart.js"></script>
 
