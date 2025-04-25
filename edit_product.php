@@ -129,21 +129,25 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
             margin-top: 15px;
         }
 
-        .floating-insert {
+        .floating-return {
             position: fixed;
             bottom: 30px;
-            right: 30px;
-            background: black;
+            left: 30px;
+            background: #111;
+            /* Green color, similar to a 'back' button */
             color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 999px;
-            font-size: 30px;
-            text-align: center;
-            line-height: 60px;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
             font-weight: bold;
             text-decoration: none;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+        .floating-return:hover {
+            background: #333;
+            /* Darker green when hovered */
         }
     </style>
 </head>
@@ -203,97 +207,7 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
 
     </div>
 
-    <a class="floating-insert" href="insert_product.php">+</a>
-
-    <script>
-        let allCategorySizes = {};
-        const currentCategoryId = document.querySelector('select[name="category_id"]').value;
-
-        function fetchSizesByCategory(categoryId, callback) {
-            if (allCategorySizes[categoryId]) {
-                callback(allCategorySizes[categoryId]);
-            } else {
-                $.ajax({
-                    url: 'fetch_sizes_by_category.php',
-                    method: 'POST',
-                    dataType: 'json',
-                    data: {
-                        category_id: categoryId
-                    },
-                    success: function(sizes) {
-                        allCategorySizes[categoryId] = sizes;
-                        callback(sizes);
-                    },
-                    error: function() {
-                        alert("Unable to load sizes for this category.");
-                    }
-                });
-            }
-        }
-
-        let newSizeIndex = 0; // This will increment for each new size row added
-
-        function addSizeRow() {
-            const categoryId = document.querySelector('select[name="category_id"]').value;
-            if (!categoryId) {
-                alert("Please select a category first.");
-                return;
-            }
-
-            fetchSizesByCategory(categoryId, function(sizes) {
-                const container = document.getElementById('sizes-container');
-                const div = document.createElement('div');
-                div.className = 'size-row';
-
-                const select = document.createElement('select');
-                select.name = `new_sizes[${newSizeIndex}][size_id]`; // Use the correct index
-                sizes.forEach(size => {
-                    const opt = document.createElement('option');
-                    opt.value = size.id;
-                    opt.textContent = size.size_label;
-                    select.appendChild(opt);
-                });
-
-                const input = document.createElement('input');
-                input.name = `new_sizes[${newSizeIndex}][stock]`; // Use the correct index
-                input.type = 'number';
-                input.min = 0;
-                input.placeholder = 'Stock';
-
-                div.appendChild(select);
-                div.appendChild(input);
-                container.appendChild(div);
-
-                newSizeIndex++;
-            });
-        }
-
-        // When changing category, update all dropdowns
-        document.querySelector('select[name="category_id"]').addEventListener('change', function() {
-            const categoryId = this.value;
-            if (!categoryId) return;
-
-            fetchSizesByCategory(categoryId, function(sizes) {
-                // Update all dropdowns inside size rows
-                document.querySelectorAll('#sizes-container .size-row select').forEach(dropdown => {
-                    const selectedVal = dropdown.value;
-                    dropdown.innerHTML = '';
-                    sizes.forEach(size => {
-                        const opt = document.createElement('option');
-                        opt.value = size.id;
-                        opt.textContent = size.size_label;
-                        if (size.id == selectedVal) opt.selected = true;
-                        dropdown.appendChild(opt);
-                    });
-                });
-            });
-        });
-
-        // Trigger on page load to populate any future rows with correct sizes
-        if (currentCategoryId) {
-            document.querySelector('select[name="category_id"]').dispatchEvent(new Event('change'));
-        }
-    </script>
+    <a href="product_manage.php" class="floating-return">← Back to Dashboard</a>
 
 </body>
 

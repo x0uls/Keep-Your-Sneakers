@@ -94,13 +94,53 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
             justify-content: center;
         }
 
+        /* Main Dashboard Layout */
+        .main-container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        /* Sidebar (Button Container) */
+        .button-container {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .button-container a {
+            display: block;
+            padding: 12px;
+            color: #333;
+            text-decoration: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            background-color: #fff;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .button-container a:hover {
+            background-color: #ddd;
+        }
+
+        /* Main Content */
         .dashboard-container {
             background-color: white;
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
             width: 100%;
+            max-width: 800px;
             text-align: center;
         }
 
@@ -181,38 +221,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
 <body>
 
     <div class="dashboard-container-wrapper">
-        <div class="dashboard-container">
-            <h2>Dashboard</h2>
+        <div class="main-container">
+            <!-- Sidebar (Button Container) -->
+            <div class="button-container">
+                <a href="dashboard.php">Dashboard</a>
+                <a href="orders.php">Orders</a>
+            </div>
 
-            <?php
-            $profile_picture_path = $user['profile_picture'] ? "profilepic/" . htmlspecialchars($user['profile_picture']) : "profilepic/default-profile-icon.png";
+            <!-- Main Content -->
+            <div class="dashboard-container">
+                <h2>Dashboard</h2>
 
-            ?>
-            <img src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" width="150" height="150">
+                <?php
+                $profile_picture_path = $user['profile_picture'] ? "profilepic/" . htmlspecialchars($user['profile_picture']) : "profilepic/default-profile-icon.png";
+                ?>
+                <img src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" width="150" height="150">
 
-            <form action="upload_profile_picture.php" method="POST" enctype="multipart/form-data">
-                <label for="profile_picture">Change Profile Picture</label>
-                <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required>
-                <button type="submit">Upload New Picture</button>
-            </form>
+                <form action="upload_profile_picture.php" method="POST" enctype="multipart/form-data">
+                    <label for="profile_picture">Change Profile Picture</label>
+                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required>
+                    <button type="submit">Upload New Picture</button>
+                </form>
 
-            <form method="POST">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" readonly>
+                <form method="POST">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" readonly>
 
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
 
-                <button type="submit" name="change_password">Change Password</button>
-            </form>
+                    <button type="submit" name="change_password">Change Password</button>
+                </form>
 
-            <a href="logout.php" class="logout-link">Logout</a>
+                <a href="logout.php" class="logout-link">Logout</a>
 
-            <?php if (isset($success_message)): ?>
-                <div class="message-success"><?php echo $success_message; ?></div>
-            <?php elseif (isset($error_message)): ?>
-                <div class="message-error"><?php echo $error_message; ?></div>
-            <?php endif; ?>
+                <?php if (isset($success_message)): ?>
+                    <div class="message-success"><?php echo $success_message; ?></div>
+                <?php elseif (isset($error_message)): ?>
+                    <div class="message-error"><?php echo $error_message; ?></div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 

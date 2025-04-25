@@ -16,6 +16,7 @@
     padding: 10px 20px;
 }
 
+
 nav btn {
     text-decoration: none;
     font-size: 18px;
@@ -77,6 +78,7 @@ header {
     background-color: #fff;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     height: 30px;
+    position: relative;
 }
 
 /* Sign In Button */
@@ -220,13 +222,13 @@ nav {
 
 .profile-icon {
     width: 40px;
-    /* Adjust size */
     height: 40px;
     border-radius: 50%;
-    /* Make it circular */
     object-fit: cover;
-    /* Ensures proper image scaling */
     transition: 0.3s ease-in-out;
+    position: fixed;
+    top: 15px;
+    right: 30px;
 }
 
 .profile-icon:hover {
@@ -262,9 +264,7 @@ nav {
 .search-form {
     position: absolute;
     top: 10px;
-    /* Adjust this value to move it down */
     right: 250px;
-    /* Adjust this value to move it from the right */
     display: absolute;
     align-items: center;
     background: white;
@@ -302,5 +302,9 @@ nav {
 }
 
 .cart-button {
-    width: 32px;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 20px;
+    right: 550px;
 }

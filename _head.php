@@ -8,26 +8,23 @@ $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 $total_items = count($cart_items);
 
 // Fetch user profile picture if logged in
-$profile_picture_path = '/profilepic/default-profile-icon.png'; // Default fallback
-
+$profile_picture_path = '/profilepic/default-profile-icon.png'; // Default fallback\
 if (isset($_SESSION['user_id'])) {
-    include __DIR__ . '/db.php';
-
+    include __DIR__ . '/db.php'; // Absolute path for safety
     try {
         $stmt = $pdo->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
         $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
         $profile_picture = $stmt->fetchColumn();
 
-        if ($profile_picture && file_exists($_SERVER['DOCUMENT_ROOT'] . '/profilepic/' . $profile_picture)) {
-            $profile_picture_path = '/profilepic/' . $profile_picture;
+        if ($profile_picture && file_exists(__DIR__ . '/../uploads/' . $profile_picture)) {
+            $profile_picture_path = $_SERVER['DOCUMENT_ROOT'] . '/profilepic/' . $profile_picture;
         }
     } catch (PDOException $e) {
-        // Silently fail and use default
+        // Just fallback to default
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -89,11 +86,9 @@ if (isset($_SESSION['user_id'])) {
             </form>
 
             <!-- Cart Button -->
-            <div class="cart-button">
-                <a href="/cart.php">
-                    <img src="/images/cart.png" alt="Cart" style="width: 35px; height: 35px; position: absolute; top: 19px; right: 160px;" class="class-button" />
-                </a>
-            </div>
+            <a href="/cart.php">
+                <img src="/images/cart.png" alt="Cart" class="cart-button" />
+            </a>
         </div>
     </header>
 
