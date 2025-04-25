@@ -185,7 +185,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
             <h2>Dashboard</h2>
 
             <?php
-            $profile_picture_path = $user['profile_picture'] ? "uploads/" . htmlspecialchars($user['profile_picture']) : "images/default-profile-icon.png";
+            $profile_picture_path = $user['profile_picture'] ? "profilepic/" . htmlspecialchars($user['profile_picture']) : "profilepic/default-profile-icon.png";
+
             ?>
             <img src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" width="150" height="150">
 

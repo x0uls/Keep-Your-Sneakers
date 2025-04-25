@@ -2,9 +2,33 @@
 session_start();
 require 'db.php';  // Ensure PDO connection is established at the beginning
 
-// ✅ Handle AJAX remove request BEFORE any HTML or includes
+// ✅ Handle AJAX update request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update') {
+    header('Content-Type: application/json');
+
+    if (isset($_POST['product_id'], $_POST['size_id'], $_POST['quantity'], $_SESSION['user_id'])) {
+        $product_id = intval($_POST['product_id']);
+        $size_id = intval($_POST['size_id']);
+        $quantity = intval($_POST['quantity']);
+        $user_id = $_SESSION['user_id'];
+
+        $stmt = $pdo->prepare("UPDATE cart SET quantity = :quantity WHERE user_id = :user_id AND product_id = :product_id AND size_id = :size_id");
+        $stmt->bindParam(':quantity', $quantity);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':product_id', $product_id);
+        $stmt->bindParam(':size_id', $size_id);
+        $success = $stmt->execute();
+
+        echo json_encode(['success' => $success]);
+        exit;
+    }
+    echo json_encode(['success' => false, 'error' => 'Invalid update']);
+    exit;
+}
+
+// ✅ Handle AJAX remove request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove') {
-    header('Content-Type: application/json'); // Tell browser it's JSON
+    header('Content-Type: application/json');
 
     if (isset($_POST['product_id'], $_POST['size_id'], $_SESSION['user_id'])) {
         $product_id = intval($_POST['product_id']);
@@ -21,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
 
-    echo json_encode(['success' => false, 'error' => 'Invalid request']);
+    echo json_encode(['success' => false, 'error' => 'Invalid remove request']);
     exit;
 }
 
@@ -30,11 +54,12 @@ include '_head.php';
 
 $total_price = 0;
 $cart_items = [];
+$stock_warnings = [];
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
 
-    // Fetch cart items with PDO
+    // Fetch cart items with product info and stock
     $sql = "SELECT 
             c.product_id, c.size_id, c.quantity, 
             p.name, p.price, p.image, 
@@ -48,8 +73,26 @@ if (isset($_SESSION['user_id'])) {
     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
 
-    // Fetch results and populate $cart_items
+    // Loop through items and adjust quantity if needed
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $max_stock = intval($row['stock']);
+        $current_qty = intval($row['quantity']);
+
+        if ($current_qty > $max_stock) {
+            // Update DB to max stock
+            $update_stmt = $pdo->prepare("UPDATE cart SET quantity = :quantity WHERE user_id = :user_id AND product_id = :product_id AND size_id = :size_id");
+            $update_stmt->execute([
+                ':quantity' => $max_stock,
+                ':user_id' => $user_id,
+                ':product_id' => $row['product_id'],
+                ':size_id' => $row['size_id'],
+            ]);
+
+            $row['quantity'] = $max_stock;
+
+            $stock_warnings[] = "Your item \"{$row['name']}\" (Size {$row['size_label']}) was reduced to {$max_stock} due to stock limits.";
+        }
+
         $cart_items[] = $row;
     }
 }
@@ -84,6 +127,20 @@ if (isset($_SESSION['user_id'])) {
             font-weight: 600;
             margin-bottom: 30px;
             text-align: center;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .warning-box ul {
+            margin: 0;
+            padding-left: 20px;
         }
 
         #cartItems {
@@ -177,12 +234,22 @@ if (isset($_SESSION['user_id'])) {
             }
         }
     </style>
-
 </head>
 
 <body>
     <div id="cartContainer">
         <h2>Shopping Cart</h2>
+
+        <?php if (!empty($stock_warnings)): ?>
+            <div class="warning-box">
+                <ul>
+                    <?php foreach ($stock_warnings as $warning): ?>
+                        <li><?php echo htmlspecialchars($warning); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
         <?php if (!empty($cart_items)): ?>
             <div id="cartItems">
                 <?php foreach ($cart_items as $item): ?>
@@ -226,9 +293,7 @@ if (isset($_SESSION['user_id'])) {
         <?php endif; ?>
     </div>
 
-
     <script src="js/cart.js"></script>
-
 </body>
 
 </html>

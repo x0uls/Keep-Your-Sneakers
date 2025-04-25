@@ -20,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ✅ 3. Get category ID
     $cat_stmt = $pdo->prepare("SELECT id FROM categories WHERE name = :name");
-    $cat_stmt->execute(['name' => $category]);
+    $cat_stmt->bindParam(':name', $category, PDO::PARAM_STR);
+    $cat_stmt->execute();
     $category_data = $cat_stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$category_data) {
@@ -32,10 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ✅ 4. Get size ID
     $size_stmt = $pdo->prepare("SELECT id FROM sizes WHERE size_label = :label AND category_id = :category_id");
-    $size_stmt->execute([
-        'label' => $size_label,
-        'category_id' => $category_id
-    ]);
+    $size_stmt->bindParam(':label', $size_label, PDO::PARAM_STR);
+    $size_stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+    $size_stmt->execute();
     $size_data = $size_stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$size_data) {
@@ -45,32 +45,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $size_id = $size_data['id'];
 
-    // ✅ 5. Check if item already exists in cart
+    // ✅ 5. Check stock for the selected size
+    $stock_stmt = $pdo->prepare("SELECT stock FROM product_sizes WHERE product_id = :product_id AND size_id = :size_id");
+    $stock_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+    $stock_stmt->bindParam(':size_id', $size_id, PDO::PARAM_INT);
+    $stock_stmt->execute();
+    $stock_data = $stock_stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$stock_data || $stock_data['stock'] <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Sorry, this size is out of stock']);
+        exit;
+    }
+
+    // ✅ 6. Check if item already exists in cart
     $check_stmt = $pdo->prepare("SELECT * FROM cart WHERE user_id = :user_id AND product_id = :product_id AND size_id = :size_id");
-    $check_stmt->execute([
-        'user_id' => $user_id,
-        'product_id' => $product_id,
-        'size_id' => $size_id
-    ]);
+    $check_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $check_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+    $check_stmt->bindParam(':size_id', $size_id, PDO::PARAM_INT);
+    $check_stmt->execute();
 
     if ($check_stmt->rowCount() > 0) {
-        // ✅ 6. If exists, update quantity
-        $update_stmt = $pdo->prepare("UPDATE cart SET quantity = quantity + 1 WHERE user_id = :user_id AND product_id = :product_id AND size_id = :size_id AND category_id = :category_id");
-        $update_stmt->execute([
-            'user_id' => $user_id,
-            'product_id' => $product_id,
-            'size_id' => $size_id,
-            'category_id' => $category_id
-        ]);
+        // ✅ 7. If exists, update quantity
+        $update_stmt = $pdo->prepare("UPDATE cart SET quantity = quantity + 1 WHERE user_id = :user_id AND product_id = :product_id AND size_id = :size_id");
+        $update_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $update_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $update_stmt->bindParam(':size_id', $size_id, PDO::PARAM_INT);
+        $update_stmt->execute();
     } else {
-        // ✅ 7. If new, insert into cart
+        // ✅ 8. If new, insert into cart
         $insert_stmt = $pdo->prepare("INSERT INTO cart (user_id, product_id, size_id, category_id, quantity) VALUES (:user_id, :product_id, :size_id, :category_id, 1)");
-        $insert_stmt->execute([
-            'user_id' => $user_id,
-            'product_id' => $product_id,
-            'size_id' => $size_id,
-            'category_id' => $category_id
-        ]);
+        $insert_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $insert_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $insert_stmt->bindParam(':size_id', $size_id, PDO::PARAM_INT);
+        $insert_stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+        $insert_stmt->execute();
     }
 
     echo json_encode(['status' => 'success', 'message' => 'Item added to cart']);

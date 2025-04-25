@@ -6,16 +6,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category'])) {
     $category = $_POST['category'];
     $product_id = $_POST['product_id'];
 
+    // Get category ID based on the selected category name
     $category_stmt = $pdo->prepare("SELECT id FROM categories WHERE name = :category");
     $category_stmt->bindParam(':category', $category, PDO::PARAM_STR);
     $category_stmt->execute();
     $category_data = $category_stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($category_data) {
+        // Query for available sizes for the given product and category
         $size_stmt = $pdo->prepare("SELECT s.size_label, ps.stock FROM sizes s
                                     JOIN product_sizes ps ON s.id = ps.size_id
-                                    WHERE s.category_id = :category_id AND ps.product_id = :product_id");
-        $size_stmt->bindParam(':category_id', $category_data['id'], PDO::PARAM_INT);
+                                    WHERE ps.product_id = :product_id");
         $size_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
         $size_stmt->execute();
         $sizes = $size_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -26,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category'])) {
                     . htmlspecialchars($size['size_label']) . '</button>';
             }
         } else {
-            echo '<p>No sizes available for this category.</p>';
+            echo '<p>No sizes available for this product.</p>';
         }
     }
     exit;

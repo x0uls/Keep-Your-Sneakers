@@ -8,23 +8,26 @@ $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 $total_items = count($cart_items);
 
 // Fetch user profile picture if logged in
-$profile_picture_path = '/profilepic/default-profile-icon.png'; // Default fallback\
+$profile_picture_path = '/profilepic/default-profile-icon.png'; // Default fallback
+
 if (isset($_SESSION['user_id'])) {
-    include __DIR__ . '/db.php'; // Absolute path for safety
+    include __DIR__ . '/db.php';
+
     try {
         $stmt = $pdo->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
         $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
         $profile_picture = $stmt->fetchColumn();
 
-        if ($profile_picture && file_exists(__DIR__ . '/../uploads/' . $profile_picture)) {
-            $profile_picture_path = $_SERVER['DOCUMENT_ROOT'] . '/profilepic/' . $profile_picture;
+        if ($profile_picture && file_exists($_SERVER['DOCUMENT_ROOT'] . '/profilepic/' . $profile_picture)) {
+            $profile_picture_path = '/profilepic/' . $profile_picture;
         }
     } catch (PDOException $e) {
-        // Just fallback to default
+        // Silently fail and use default
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

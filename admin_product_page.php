@@ -153,7 +153,7 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
     <div class="admin-container">
         <h2>Edit Product</h2>
 
-        <form method="POST" action="update_product.php">
+        <form method="POST" action="update_product.php" enctype="multipart/form-data">
             <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
 
             <label>Product Name</label>
@@ -178,6 +178,8 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
             <label>Product Image</label>
             <img src="/products/<?= htmlspecialchars($product['image']) ?>" alt="Product Image" class="image-preview">
 
+            <input type="file" name="product_image" accept="image/*">
+
             <label>Sizes & Stock</label>
             <div id="sizes-container">
                 <?php foreach ($sizes as $s): ?>
@@ -198,6 +200,7 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
 
             <button type="submit" class="save-btn">Save Changes</button>
         </form>
+
     </div>
 
     <a class="floating-insert" href="insert_product.php">+</a>
