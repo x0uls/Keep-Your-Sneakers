@@ -97,7 +97,8 @@ include '_head.php';
                     $current_time = date('Y-m-d H:i:s');
 
                     if (strtotime($expires_at) > strtotime($current_time)) {
-                        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+                        // Changed to SHA-1
+                        $hashed_password = sha1($new_password);
 
                         // Update password
                         $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE id = :user_id");

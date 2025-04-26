@@ -18,13 +18,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'])) {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $is_admin = isset($_POST['is_admin']) ? 1 : 0;
+    $new_password = trim($_POST['new_password']);
+    $confirm_password = trim($_POST['confirm_password']);
 
     try {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, is_admin = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $is_admin, $user_id]);
-
-        $message = "User updated successfully.";
-        $message_type = "success";
+        // Check if password is at least 8 characters long
+        if (!empty($new_password) && strlen($new_password) < 8) {
+            $message = "Password must be at least 8 characters long.";
+            $message_type = "error";
+        } elseif (!empty($new_password) && $new_password !== $confirm_password) {
+            $message = "New passwords do not match.";
+            $message_type = "error";
+        } else {
+            // If password is provided and confirmed
+            if (!empty($new_password)) {
+                // Hash the new password
+                $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, is_admin = ?, password = ? WHERE id = ?");
+                $stmt->execute([$username, $email, $is_admin, $hashed_password, $user_id]);
+                $message = "User updated successfully, password changed.";
+                $message_type = "success";
+            } else {
+                // If no password is provided, update only other fields
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, is_admin = ? WHERE id = ?");
+                $stmt->execute([$username, $email, $is_admin, $user_id]);
+                $message = "User updated successfully.";
+                $message_type = "success";
+            }
+        }
     } catch (PDOException $e) {
         $message = "Error updating user: " . $e->getMessage();
         $message_type = "error";
@@ -82,7 +103,8 @@ if (isset($_GET['id'])) {
         }
 
         form input[type="text"],
-        form input[type="email"] {
+        form input[type="email"],
+        form input[type="password"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -127,6 +149,25 @@ if (isset($_GET['id'])) {
             background-color: #f2dede;
             color: #a94442;
         }
+
+        .floating-return {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: #111;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+        .floating-return:hover {
+            background: #333;
+        }
     </style>
 </head>
 
@@ -150,6 +191,12 @@ if (isset($_GET['id'])) {
             <label for="email">Email</label>
             <input type="email" name="email" id="email" required value="<?php echo htmlspecialchars($user['email']); ?>">
 
+            <label for="new_password">New Password</label>
+            <input type="password" name="new_password" id="new_password" placeholder="Leave empty to keep current password">
+
+            <label for="confirm_password">Confirm New Password</label>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="Leave empty to keep current password">
+
             <label>
                 <input type="checkbox" name="is_admin" <?php echo $user['is_admin'] ? 'checked' : ''; ?>> Admin
             </label>
@@ -157,6 +204,8 @@ if (isset($_GET['id'])) {
             <button type="submit" class="submit-btn">Update User</button>
         </form>
     </div>
+
+    <a href="user_manage.php" class="floating-return">← Back to User Manage</a>
 
 </body>
 

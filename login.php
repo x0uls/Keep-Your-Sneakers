@@ -21,7 +21,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $user = $stmt->fetch();
 
-        if (password_verify($password, $user['password'])) {
+        // Compare the hashed password using sha1
+        if (sha1($password) === $user['password']) {
             $_SESSION['user_id'] = $user['id'];
             if ($user['is_admin']) {
                 $_SESSION['admin'] = true;

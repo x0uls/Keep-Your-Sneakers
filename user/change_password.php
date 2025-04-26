@@ -1,6 +1,14 @@
 <?php
 session_start();
 require '../db.php'; // adjust if your db connection file is elsewhere
+require '../lib/PHPMailer.php';
+require '../lib/SMTP.php';
+require '../lib/Exception.php';
+require '../vendor/autoload.php'; // if using Composer, include this
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php'; // if using Composer, include this
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
@@ -16,21 +24,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirmPassword = $_POST['confirm_password'];
 
     // Fetch the user's current password hash
-    $stmt = $pdo->prepare('SELECT password FROM users WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT password, email FROM users WHERE id = ?');
     $stmt->execute([$userId]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user || !password_verify($currentPassword, $user['password'])) {
+    if (!$user || sha1($currentPassword) !== $user['password']) { // << changed
         $message = 'Current password is incorrect.';
     } elseif ($newPassword !== $confirmPassword) {
         $message = 'New passwords do not match.';
     } else {
         // Everything is fine — update password
-        $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $newPasswordHash = sha1($newPassword); // << changed
         $updateStmt = $pdo->prepare('UPDATE users SET password = ? WHERE id = ?');
         $updateStmt->execute([$newPasswordHash, $userId]);
 
-        $message = 'Password successfully changed!';
+        // Send email notification using PHPMailer
+        $to = $user['email'];
+        $subject = 'Your Password Has Been Changed';
+        $body = 'Hello, your password has been successfully changed. If you did not make this change, please contact support immediately.';
+
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'liaw.casual@gmail.com';
+            $mail->Password   = 'buvq yftx klma vezl'; // App password (still original)
+            $mail->SMTPSecure = 'tls';
+            $mail->Port       = 587;
+
+            $mail->setFrom('no-reply@yourdomain.com', 'Your Site Name');
+            $mail->addAddress($to);
+
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = nl2br($body);
+
+            $mail->send();
+
+            $message = 'Password successfully changed! Redirecting...';
+        } catch (Exception $e) {
+            $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
     }
 }
 ?>
@@ -123,6 +158,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Change Password</button>
         </form>
     </div>
+
+    <?php if ($message == 'Password successfully changed! Redirecting...'): ?>
+        <script>
+            // Wait for 5 seconds and then redirect to the dashboard
+            setTimeout(function() {
+                window.location.replace('dashboard.php');
+            }, 5000);
+        </script>
+    <?php endif; ?>
 
 </body>
 

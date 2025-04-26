@@ -5,15 +5,27 @@ include '_head.php';
 
 if (isset($_GET['query'])) {
     $search = trim($_GET['query']); // Clean the search input
+    $min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : null;
+    $max_price = isset($_GET['max_price']) ? (float)$_GET['max_price'] : null;
+
     try {
         $sql = "SELECT * FROM products 
                 WHERE name LIKE :search";
 
+        if ($min_price !== null && $max_price !== null) {
+            $sql .= " AND price BETWEEN :min_price AND :max_price";
+        }
+
         $stmt = $pdo->prepare($sql);
         $searchTerm = "%" . $search . "%";
         $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
-        $stmt->execute();
 
+        if ($min_price !== null && $max_price !== null) {
+            $stmt->bindParam(':min_price', $min_price);
+            $stmt->bindParam(':max_price', $max_price);
+        }
+
+        $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
@@ -21,6 +33,7 @@ if (isset($_GET['query'])) {
     }
 } else {
     $result = null;
+    $search = '';
 }
 ?>
 
@@ -40,11 +53,25 @@ if (isset($_GET['query'])) {
             padding: 0;
         }
 
+        .container {
+            display: flex;
+            padding: 40px;
+            margin-top: 100px;
+        }
+
+        .sidebar {
+            width: 200px;
+            min-width: 200px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            margin-right: 40px;
+        }
+
         .search-results-container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 0;
+            flex: 1;
         }
 
         h2 {
@@ -53,6 +80,37 @@ if (isset($_GET['query'])) {
             font-weight: 600;
             margin-bottom: 40px;
             color: #333;
+        }
+
+        .filter-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .filter-form input[type="number"],
+        .filter-form button {
+            width: 180px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .filter-form button {
+            background-color: #111;
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-form button:hover {
+            background-color: #333;
         }
 
         .product {
@@ -118,7 +176,46 @@ if (isset($_GET['query'])) {
             background-color: #333;
         }
 
+        .price-input {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .price-input span {
+            position: absolute;
+            left: 10px;
+            top: 40%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .price-input input {
+            width: 100%;
+            padding: 10px 10px 10px 30px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+        }
+
+
         @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                /* Full width for smaller screens */
+                margin-bottom: 20px;
+            }
+
+            .search-results-container {
+                width: 100%;
+                /* Full width for smaller screens */
+            }
+
             .product {
                 width: calc(50% - 40px);
             }
@@ -139,25 +236,54 @@ if (isset($_GET['query'])) {
 
 <body>
 
-    <div class="search-results-container">
-        <h2>Search Results</h2>
+    <div class="container">
+        <!-- Sidebar on the left for price filter -->
+        <div class="sidebar">
+            <h3>Filter by Price</h3>
+            <div class="filter-form">
+                <form method="GET" action="search.php">
+                    <input type="hidden" name="query" value="<?php echo htmlspecialchars($search); ?>">
 
-        <?php
-        if ($result && count($result) > 0) {
-            foreach ($result as $row) {
-                echo '<a href="product_page.php?id=' . $row['id'] . '" class="product">';
-                $image_path = '/products/' . $row['image']; // Assuming the image is stored in /uploads
-                echo '<img src="' . $image_path . '" alt="' . $row['name'] . '">';
-                echo '<h3>' . $row['name'] . '</h3>';
-                echo '<p>RM ' . number_format($row['price'], 2) . '</p>';
-                echo '<span class="product-button">View Product</span>';
-                echo '</a>';
+                    <div class="price-input">
+                        <span>RM</span>
+                        <input type="number" name="min_price" placeholder="Min Price"
+                            <?php if (isset($_GET['min_price'])) echo 'value="' . $_GET['min_price'] . '"'; ?> required>
+                    </div>
+
+                    <div class="price-input">
+                        <span>RM</span>
+                        <input type="number" name="max_price" placeholder="Max Price"
+                            <?php if (isset($_GET['max_price'])) echo 'value="' . $_GET['max_price'] . '"'; ?> required>
+                    </div>
+
+                    <button type="submit">Apply Filter</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Product Results in the center -->
+        <div class="search-results-container">
+            <h2>Search Results</h2>
+
+            <!-- Products will be displayed here -->
+            <?php
+            if ($result && count($result) > 0) {
+                foreach ($result as $row) {
+                    echo '<a href="product_page.php?id=' . $row['id'] . '" class="product">';
+                    $image_path = '/products/' . $row['image']; // Assuming the image is stored in /products
+                    echo '<img src="' . $image_path . '" alt="' . htmlspecialchars($row['name']) . '">';
+                    echo '<h3>' . htmlspecialchars($row['name']) . '</h3>';
+                    echo '<p>RM ' . number_format($row['price'], 2) . '</p>';
+                    echo '<span class="product-button">View Product</span>';
+                    echo '</a>';
+                }
+            } else {
+                if (isset($_GET['query'])) { // ✅ Only show "no results" if search/filter was attempted
+                    echo "<p class='no-results'>No products found for '" . htmlspecialchars($search) . "'</p>";
+                }
             }
-        } else {
-            echo "<p class='no-results'>No products found for '$search'</p>";
-        }
-        ?>
-
+            ?>
+        </div>
     </div>
 
 </body>

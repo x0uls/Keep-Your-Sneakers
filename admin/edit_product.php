@@ -213,7 +213,7 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
 
     </div>
 
-    <a href="product_manage.php" class="floating-return">← Back to Dashboard</a>
+    <a href="product_manage.php" class="floating-return">← Back to Product Manage</a>
 
 </body>
 
