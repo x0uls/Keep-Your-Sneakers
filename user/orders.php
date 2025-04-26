@@ -1,12 +1,12 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: LogInPage.php");
+    header("Location: ../login.php");
     exit();
 }
 
-include '_head.php';
-include 'db.php';
+include '../_head.php';
+include '../db.php';
 
 // Fetch orders for the user
 $stmt = $pdo->prepare("SELECT id, shipping_status FROM orders WHERE user_id = :user_id");

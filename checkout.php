@@ -4,7 +4,7 @@ require 'db.php';
 include '_head.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit;
 }
 

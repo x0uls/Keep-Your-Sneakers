@@ -1,11 +1,11 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit();
 }
 
-include 'db.php'; // PDO connection
+include '../db.php'; // PDO connection
 
 if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) {
     $file_name = $_FILES['profile_picture']['name'];
@@ -32,7 +32,7 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
 
     if (in_array($file_ext, $allowed_extensions)) {
         $new_file_name = uniqid() . '.' . $file_ext;
-        $upload_path = 'profilepic/' . $new_file_name;
+        $upload_path = '../profilepic/' . $new_file_name;
 
         // Fetch the current profile picture from the database
         try {

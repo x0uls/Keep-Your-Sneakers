@@ -7,7 +7,7 @@ session_start();
 
 $user_id = $_SESSION['user_id'] ?? null;
 if (!$user_id) {
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit;
 }
 

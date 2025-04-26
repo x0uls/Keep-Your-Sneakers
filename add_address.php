@@ -5,7 +5,7 @@ include '_head.php';
 
 if (!isset($_SESSION['user_id'])) {
     // Redirect to login if not logged in
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit;
 }
 

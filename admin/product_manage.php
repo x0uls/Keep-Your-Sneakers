@@ -1,11 +1,12 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
-    header("Location: LogInPage.php");
+    header("Location: ../login.php");
     exit();
 }
 
-include 'db.php'; // Database connection
+include '../db.php'; // Database connection
 
 // Success and error messages
 $message = '';
@@ -225,7 +226,7 @@ if (isset($_GET['message'])) {
                         <td>RM <?php echo number_format($product['price'], 2); ?></td>
                         <td>
                             <?php if (!empty($product['image'])): ?>
-                                <img src="uploads/<?php echo htmlspecialchars($product['image']); ?>"
+                                <img src="../uploads/<?php echo htmlspecialchars($product['image']); ?>"
                                     alt="<?php echo htmlspecialchars($product['name']); ?>"
                                     class="product-image">
                             <?php else: ?>
@@ -256,6 +257,8 @@ if (isset($_GET['message'])) {
 
     <!-- Floating Back to Dashboard Button -->
     <a href="admin_dashboard.php" class="floating-return">← Back to Dashboard</a>
+
+    <script src="../js/admin.js"></script>
 
 </body>
 

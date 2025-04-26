@@ -3,6 +3,11 @@ session_start();
 include '_head.php';
 include 'db.php'; // Include your db connection
 
+if (isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
@@ -20,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $user['id'];
             if ($user['is_admin']) {
                 $_SESSION['admin'] = true;
-                header("Location: admin_dashboard.php");
+                header("Location: ../admin/admin_dashboard.php");
             } else {
                 header("Location: index.php");
             }
@@ -112,11 +117,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required>
 
-        <a href="forgot_password.php">Forgot password?</a>
+        <a href="../forgot_password.php">Forgot password?</a>
 
         <input type="submit" value="Login">
 
-        <p>New User? <a href="SignUpPage.php">Sign up here</a></p>
+        <p>New User? <a href="signup.php">Sign up here</a></p>
 
         <?php if (isset($error)): ?>
             <div class="error-msg"><?php echo $error; ?></div>

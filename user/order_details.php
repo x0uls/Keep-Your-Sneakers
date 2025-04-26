@@ -1,12 +1,12 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit();
 }
 
-include '_head.php';
-include 'db.php';
+include '../_head.php';
+include '../db.php';
 
 // Get the order_id from the URL
 if (isset($_GET['order_id'])) {
@@ -23,12 +23,12 @@ if (isset($_GET['order_id'])) {
     // Fetch order items (assuming you have a table for order items)
     // Fetch order details along with product name and size
     $stmt = $pdo->prepare("
-SELECT oi.quantity, oi.price, p.name, s.size_label
-FROM order_items oi
-JOIN products p ON oi.product_id = p.id
-JOIN sizes s ON oi.size_id = s.id
-WHERE oi.order_id = :order_id
-");
+        SELECT oi.quantity, oi.price, p.name, s.size_label
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        JOIN sizes s ON oi.size_id = s.id
+        WHERE oi.order_id = :order_id
+        ");
     $stmt->bindParam(':order_id', $_GET['order_id'], PDO::PARAM_INT);
     $stmt->execute();
     $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -150,8 +150,8 @@ WHERE oi.order_id = :order_id
                                     <td><?php echo htmlspecialchars($item['name']); ?></td>
                                     <td><?php echo htmlspecialchars($item['size_label']); ?></td>
                                     <td><?php echo htmlspecialchars($item['quantity']); ?></td>
-                                    <td><?php echo number_format($item['price'], 2); ?> USD</td>
-                                    <td><?php echo number_format($item['price'] * $item['quantity'], 2); ?> USD</td>
+                                    <td>RM <?php echo number_format($item['price'], 2); ?></td>
+                                    <td>RM <?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -169,7 +169,7 @@ WHERE oi.order_id = :order_id
         </div>
     </div>
 
-    <?php include '_foot.php'; ?>
+    <?php include '../_foot.php'; ?>
 </body>
 
 </html>

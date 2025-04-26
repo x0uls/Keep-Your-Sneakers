@@ -4,5 +4,5 @@ session_unset(); // Unset all session variables
 session_destroy(); // Destroy the session
 
 // Redirect to the main page after logout
-header("Location: index.php");
+header("Location: login.php");
 exit(); // Make sure no further code is executed after the redirect

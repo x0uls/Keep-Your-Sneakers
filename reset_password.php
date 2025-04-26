@@ -111,7 +111,7 @@ include '_head.php';
                             $stmt->execute();
 
                             echo "<div class='message success-msg'>Your password has been reset. Redirecting to login...</div>";
-                            echo "<script>setTimeout(() => { window.location.href = 'LogInPage.php'; }, 2000);</script>";
+                            echo "<script>setTimeout(() => { window.location.href = 'login.php'; }, 2000);</script>";
                         } else {
                             echo "<div class='message error-msg'>Failed to update password. Try again.</div>";
                         }

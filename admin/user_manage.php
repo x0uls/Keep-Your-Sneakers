@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin']) || $_SESSION['adm
     exit();
 }
 
-include 'db.php'; // Database connection
+include '../db.php'; // Database connection
 
 // Success and error messages
 $message = '';
@@ -279,7 +279,7 @@ if (isset($_GET['message'])) {
                             <?php echo $user['is_admin'] ? '<span class="admin-label">Admin</span>' : 'User'; ?>
                         </td>
                         <td>
-                            <a href="edit_user.php?user_id=<?php echo $user['id']; ?>">Edit</a>
+                            <a href="edit_user.php?id=<?php echo $user['id']; ?>">Edit</a>
                             <?php if ($user['id'] != $_SESSION['user_id']): ?>
                                 <form class="inline-form" action="user_manage.php" method="POST">
                                     <input type="hidden" name="delete_id" value="<?php echo $user['id']; ?>">

@@ -1,15 +1,15 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit();
 }
 
-include '_head.php';
-include 'db.php';
-require 'lib/PHPMailer.php';
-require 'lib/SMTP.php';
-require 'lib/Exception.php';
+include '../_head.php';
+include '../db.php';
+require '../lib/PHPMailer.php';
+require '../lib/SMTP.php';
+require '../lib/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -233,7 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
                 <h2>Dashboard</h2>
 
                 <?php
-                $profile_picture_path = $user['profile_picture'] ? "profilepic/" . htmlspecialchars($user['profile_picture']) : "profilepic/default-profile-icon.png";
+                $profile_picture_path = $user['profile_picture'] ? "../profilepic/" . htmlspecialchars($user['profile_picture']) : "../profilepic/default-profile-icon.png";
                 ?>
                 <img src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" width="150" height="150">
 
@@ -253,7 +253,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
                     <button type="submit" name="change_password">Change Password</button>
                 </form>
 
-                <a href="logout.php" class="logout-link">Logout</a>
+                <a href="../logout.php" class="logout-link">Logout</a>
 
                 <?php if (isset($success_message)): ?>
                     <div class="message-success"><?php echo $success_message; ?></div>
@@ -264,7 +264,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
         </div>
     </div>
 
-    <?php include '_foot.php'; ?>
+    <?php include '../_foot.php'; ?>
 </body>
 
 </html>

@@ -13,7 +13,7 @@ use PHPMailer\PHPMailer\Exception;
 
 $user_id = $_SESSION['user_id'] ?? null;
 if (!$user_id) {
-    header("Location: LogInPage.php");
+    header("Location: login.php");
     exit;
 }
 
@@ -64,7 +64,7 @@ if ($payment_intent->status === 'succeeded') {
 
     $pdo->beginTransaction();
     try {
-        $stmt = $pdo->prepare("INSERT INTO orders (user_id, shipping_status, created_at, payment_id, address) VALUES (?, ?, NOW(), ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO orders (user_id, shipping_status, order_date, payment_id, address) VALUES (?, ?, NOW(), ?, ?)");
         $stmt->execute([$user_id, $shipping_status, $payment_id, $address]);
 
         $order_id = $pdo->lastInsertId();

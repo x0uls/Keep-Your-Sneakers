@@ -1,7 +1,8 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
-    header("Location: LogInPage.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -287,14 +288,7 @@ if (isset($_GET['message'])) {
     <a href="admin_dashboard.php" class="floating-return">← Back to Dashboard</a>
 
     <!-- JavaScript to hide the message box after 3 seconds -->
-    <script>
-        setTimeout(function() {
-            var messageBox = document.getElementById("message-box");
-            if (messageBox) {
-                messageBox.style.display = "none";
-            }
-        }, 5000);
-    </script>
+    <script src="../js/admin.js"></script>
 
 </body>
 

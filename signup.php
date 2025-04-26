@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($stmt->execute()) {
                 $_SESSION['success'] = "Signup successful! You can now log in.";
-                header("Location: LogInPage.php");
+                header("Location: login.php");
                 exit();
             } else {
                 $errors[] = "Could not create account. Try again.";
@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Sign Up</button>
     </form>
 
-    <p>Already have an account? <a href="LogInPage.php">Log in here</a>.</p>
+    <p>Already have an account? <a href="login.php">Log in here</a>.</p>
 </div>
 
 <?php include '_foot.php'; ?>

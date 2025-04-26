@@ -1,5 +1,12 @@
 <?php
-include 'db.php'; // Use your db.php for database connection
+session_start();
+
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
+    header("Location: ../login.php");
+    exit();
+}
+
+include '../db.php'; // Use your db.php for database connection
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -12,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle image upload
     $imageName = $_FILES['image']['name'];
     $imageTmp = $_FILES['image']['tmp_name'];
-    $uploadPath = 'uploads/' . basename($imageName);
+    $uploadPath = '../uploads/' . basename($imageName);
 
     if (!move_uploaded_file($imageTmp, $uploadPath)) {
         die('Image upload failed.');
