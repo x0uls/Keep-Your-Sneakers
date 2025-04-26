@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin']) || $_SESSION['adm
     exit();
 }
 
-include '../db.php'; // Use your db.php for database connection
+include '../db.php'; // Make sure your db.php connects to your database properly
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,18 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $desc = $_POST['description'];
     $price = $_POST['price'];
     $categories = $_POST['categories'] ?? [];
-    $sizes = $_POST['sizes'] ?? []; // ✅ Fixed the key here
+    $sizes = $_POST['sizes'] ?? [];
 
     // Handle image upload
     $imageName = $_FILES['image']['name'];
     $imageTmp = $_FILES['image']['tmp_name'];
-    $uploadPath = '../uploads/' . basename($imageName);
+    $uploadPath = '../products/' . basename($imageName);
 
     if (!move_uploaded_file($imageTmp, $uploadPath)) {
         die('Image upload failed.');
     }
 
-    // Inside your POST logic (replace your current try-catch block)
     try {
         $pdo->beginTransaction();
 
@@ -34,20 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$name, $desc, $price, $imageName]);
         $productId = $pdo->lastInsertId();
 
-        // Insert into product_categories
+        // Insert product_categories
         $catStmt = $pdo->prepare("INSERT INTO product_categories (product_id, category_id) VALUES (?, ?)");
         foreach ($categories as $catId) {
             $catStmt->execute([$productId, $catId]);
         }
 
-        // Dynamically fetch category ID map
+        // Prepare size insertions
         $catMapStmt = $pdo->query("SELECT id, name FROM categories");
         $categoryMap = [];
         foreach ($catMapStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $categoryMap[$row['name']] = $row['id'];
         }
 
-        // Prepare reusable statements
         $sizeLookup = $pdo->prepare("SELECT id FROM sizes WHERE category_id = ? AND size_label = ?");
         $sizeInsert = $pdo->prepare("INSERT INTO product_sizes (product_id, size_id, stock) VALUES (?, ?, ?)");
 
@@ -113,53 +111,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="checkbox-group">
                 <div>
                     <label><input type="checkbox" name="categories[]" value="1" class="category-toggle" data-target="#sizes-men" /> Men</label>
-                    <div id="sizes-men" class="category-section sizes-group">
+                    <div id="sizes-men" class="category-section sizes-group" style="display:none;">
                         <h4>Men Sizes</h4>
-                        <div class="size-row">UK 6 (EU 40)<input type="number" name="sizes[Men][UK 6 (EU 40)]" min="0" /></div>
-                        <div class="size-row">UK 6.5 <input type="number" name="sizes[Men][UK 6.5]" min="0" /></div>
-                        <div class="size-row">UK 7 <input type="number" name="sizes[Men][UK 7]" min="0" /></div>
-                        <div class="size-row">UK 7.5 <input type="number" name="sizes[Men][UK 7.5]" min="0" /></div>
-                        <div class="size-row">UK 8 <input type="number" name="sizes[Men][UK 8]" min="0" /></div>
-                        <div class="size-row">UK 8.5 <input type="number" name="sizes[Men][UK 8.5]" min="0" /></div>
-                        <div class="size-row">UK 9 <input type="number" name="sizes[Men][UK 9]" min="0" /></div>
-                        <div class="size-row">UK 9.5 <input type="number" name="sizes[Men][UK 9.5]" min="0" /></div>
-                        <div class="size-row">UK 10 <input type="number" name="sizes[Men][UK 10]" min="0" /></div>
-                        <div class="size-row">UK 10.5 <input type="number" name="sizes[Men][UK 10.5]" min="0" /></div>
-                        <div class="size-row">UK 11 <input type="number" name="sizes[Men][UK 11]" min="0" /></div>
-                        <div class="size-row">UK 12 <input type="number" name="sizes[Men][UK 12]" min="0" /></div>
+                        <?php
+                        $menSizes = ['UK 6 (EU 40)', 'UK 6.5', 'UK 7', 'UK 7.5', 'UK 8', 'UK 8.5', 'UK 9', 'UK 9.5', 'UK 10', 'UK 10.5', 'UK 11', 'UK 12'];
+                        foreach ($menSizes as $size) {
+                            echo "<div class='size-row'>$size <input type='number' name='sizes[Men][$size]' min='0' /></div>";
+                        }
+                        ?>
                     </div>
                 </div>
 
                 <div>
                     <label><input type="checkbox" name="categories[]" value="2" class="category-toggle" data-target="#sizes-women" /> Women</label>
-                    <div id="sizes-women" class="category-section sizes-group">
+                    <div id="sizes-women" class="category-section sizes-group" style="display:none;">
                         <h4>Women Sizes</h4>
-                        <div class="size-row">UK 2.5 <input type="number" name="sizes[Women][UK 2.5]" min="0" /></div>
-                        <div class="size-row">UK 3 <input type="number" name="sizes[Women][UK 3]" min="0" /></div>
-                        <div class="size-row">UK 3.5 <input type="number" name="sizes[Women][UK 3.5]" min="0" /></div>
-                        <div class="size-row">UK 4 <input type="number" name="sizes[Women][UK 4]" min="0" /></div>
-                        <div class="size-row">UK 4.5 <input type="number" name="sizes[Women][UK 4.5]" min="0" /></div>
-                        <div class="size-row">UK 5 <input type="number" name="sizes[Women][UK 5]" min="0" /></div>
-                        <div class="size-row">UK 5.5 <input type="number" name="sizes[Women][UK 5.5]" min="0" /></div>
-                        <div class="size-row">UK 6 <input type="number" name="sizes[Women][UK 6]" min="0" /></div>
-                        <div class="size-row">UK 6.5 <input type="number" name="sizes[Women][UK 6.5]" min="0" /></div>
-                        <div class="size-row">UK 7 <input type="number" name="sizes[Women][UK 7]" min="0" /></div>
-                        <div class="size-row">UK 7.5 <input type="number" name="sizes[Women][UK 7.5]" min="0" /></div>
+                        <?php
+                        $womenSizes = ['UK 2.5', 'UK 3', 'UK 3.5', 'UK 4', 'UK 4.5', 'UK 5', 'UK 5.5', 'UK 6', 'UK 6.5', 'UK 7', 'UK 7.5'];
+                        foreach ($womenSizes as $size) {
+                            echo "<div class='size-row'>$size <input type='number' name='sizes[Women][$size]' min='0' /></div>";
+                        }
+                        ?>
                     </div>
                 </div>
 
                 <div>
                     <label><input type="checkbox" name="categories[]" value="3" class="category-toggle" data-target="#sizes-kids" /> Kids</label>
-                    <div id="sizes-kids" class="category-section sizes-group">
+                    <div id="sizes-kids" class="category-section sizes-group" style="display:none;">
                         <h4>Kids Sizes</h4>
-                        <div class="size-row">UK 3 <input type="number" name="sizes[Kids][UK 3]" min="0" /></div>
-                        <div class="size-row">UK 3.5 <input type="number" name="sizes[Kids][UK 3.5]" min="0" /></div>
-                        <div class="size-row">UK 4 <input type="number" name="sizes[Kids][UK 4]" min="0" /></div>
-                        <div class="size-row">UK 4.5 <input type="number" name="sizes[Kids][UK 4.5]" min="0" /></div>
-                        <div class="size-row">UK 5 <input type="number" name="sizes[Kids][UK 5]" min="0" /></div>
-                        <div class="size-row">UK 5.5 <input type="number" name="sizes[Kids][UK 5.5]" min="0" /></div>
-                        <div class="size-row">UK 6 (EU 39) <input type="number" name="sizes[Kids][UK 6 (EU 39)]" min="0" /></div>
-                        <div class="size-row">UK 6 (EU 40) <input type="number" name="sizes[Kids][UK 6 (EU 40)]" min="0" /></div>
+                        <?php
+                        $kidsSizes = ['UK 3', 'UK 3.5', 'UK 4', 'UK 4.5', 'UK 5', 'UK 5.5', 'UK 6 (EU 39)', 'UK 6 (EU 40)'];
+                        foreach ($kidsSizes as $size) {
+                            echo "<div class='size-row'>$size <input type='number' name='sizes[Kids][$size]' min='0' /></div>";
+                        }
+                        ?>
                     </div>
                 </div>
             </div>

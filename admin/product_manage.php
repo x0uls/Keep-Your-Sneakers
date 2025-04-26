@@ -226,7 +226,7 @@ if (isset($_GET['message'])) {
                         <td>RM <?php echo number_format($product['price'], 2); ?></td>
                         <td>
                             <?php if (!empty($product['image'])): ?>
-                                <img src="../uploads/<?php echo htmlspecialchars($product['image']); ?>"
+                                <img src="../products/<?php echo htmlspecialchars($product['image']); ?>"
                                     alt="<?php echo htmlspecialchars($product['name']); ?>"
                                     class="product-image">
                             <?php else: ?>

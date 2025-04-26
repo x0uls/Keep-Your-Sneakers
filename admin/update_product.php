@@ -17,66 +17,78 @@ $name = htmlspecialchars($_POST['name']);
 $description = htmlspecialchars($_POST['description']);
 $price = $_POST['price'];
 $category_id = $_POST['category_id'];
-$sizes = $_POST['sizes']; // Sizes and stock from the form
-$new_sizes = isset($_POST['new_sizes']) ? $_POST['new_sizes'] : []; // New sizes added by the user
+$sizes = $_POST['sizes'] ?? [];
+$new_sizes = $_POST['new_sizes'] ?? [];
 
-// Begin transaction to ensure data consistency
+// Begin transaction
 $pdo->beginTransaction();
 
-// Update product details
-$productStmt = $pdo->prepare("UPDATE products SET name = ?, description = ?, price = ? WHERE id = ?");
-$productStmt->execute([$name, $description, $price, $product_id]);
+try {
+    // Fetch current product data
+    $fetchStmt = $pdo->prepare("SELECT image FROM products WHERE id = ?");
+    $fetchStmt->execute([$product_id]);
+    $currentProduct = $fetchStmt->fetch(PDO::FETCH_ASSOC);
 
-// Update or insert sizes and stock (for existing sizes)
-foreach ($sizes as $sizeData) {
-    $sizeId = $sizeData['size_id']; // Extract size_id
-    $stock = $sizeData['stock']; // Extract stock
+    $currentImage = $currentProduct['image'];
 
-    if ($stock !== '' && is_numeric($stock)) {
-        // Check if the size already exists in the product_sizes table
-        $checkSizeStmt = $pdo->prepare("SELECT id FROM product_sizes WHERE product_id = ? AND size_id = ?");
-        $checkSizeStmt->execute([$product_id, $sizeId]);
-        $existingSize = $checkSizeStmt->fetchColumn();
+    // Handle image update
+    if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
+        $newImageName = uniqid() . '_' . basename($_FILES['product_image']['name']);
+        $newImageTmp = $_FILES['product_image']['tmp_name'];
+        $uploadPath = '../products/' . $newImageName;
 
-        if ($existingSize) {
-            // If the size exists, update the stock
-            $updateStockStmt = $pdo->prepare("UPDATE product_sizes SET stock = ? WHERE id = ?");
-            $updateStockStmt->execute([$stock, $existingSize]);
-        } else {
-            // If the size does not exist, insert it into the product_sizes table
-            $insertSizeStmt = $pdo->prepare("INSERT INTO product_sizes (product_id, size_id, stock) VALUES (?, ?, ?)");
-            $insertSizeStmt->execute([$product_id, $sizeId, $stock]);
+        if (!move_uploaded_file($newImageTmp, $uploadPath)) {
+            throw new Exception('Image upload failed.');
+        }
+
+        // Delete old image
+        if ($currentImage && file_exists('../products/' . $currentImage)) {
+            unlink('../products/' . $currentImage);
+        }
+
+        // Update product including the new image
+        $productStmt = $pdo->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE id = ?");
+        $productStmt->execute([$name, $description, $price, $newImageName, $product_id]);
+    } else {
+        // No new image uploaded, update without changing image
+        $productStmt = $pdo->prepare("UPDATE products SET name = ?, description = ?, price = ? WHERE id = ?");
+        $productStmt->execute([$name, $description, $price, $product_id]);
+    }
+
+    // Update category
+    $pdo->prepare("DELETE FROM product_categories WHERE product_id = ?")->execute([$product_id]);
+    if (!empty($category_id)) {
+        $pdo->prepare("INSERT INTO product_categories (product_id, category_id) VALUES (?, ?)")->execute([$product_id, $category_id]);
+    }
+
+    // Update sizes
+    foreach ($sizes as $ps_id => $sizeData) {
+        $sizeId = $sizeData['size_id'];
+        $stock = $sizeData['stock'];
+
+        if ($stock !== '' && is_numeric($stock)) {
+            $updateSizeStmt = $pdo->prepare("UPDATE product_sizes SET size_id = ?, stock = ? WHERE id = ?");
+            $updateSizeStmt->execute([$sizeId, $stock, $ps_id]);
         }
     }
-}
 
-foreach ($new_sizes as $newSizeData) {
-    $sizeId = isset($newSizeData['size_id']) ? $newSizeData['size_id'] : null;
-    $stock = isset($newSizeData['stock']) ? $newSizeData['stock'] : null;
+    // Insert new sizes
+    foreach ($new_sizes as $newSizeData) {
+        $sizeId = $newSizeData['size_id'] ?? null;
+        $stock = $newSizeData['stock'] ?? null;
 
-    if ($sizeId && $stock !== '' && is_numeric($stock)) {
-        // Check if the size already exists in the product_sizes table
-        $checkSizeStmt = $pdo->prepare("SELECT id, stock FROM product_sizes WHERE product_id = ? AND size_id = ?");
-        $checkSizeStmt->execute([$product_id, $sizeId]);
-        $existing = $checkSizeStmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($existing) {
-            // If the size exists, ADD to the existing stock
-            $newStock = $existing['stock'] + $stock;
-            $updateStockStmt = $pdo->prepare("UPDATE product_sizes SET stock = ? WHERE id = ?");
-            $updateStockStmt->execute([$newStock, $existing['id']]);
-        } else {
-            // If the size does not exist, insert it into the product_sizes table
-            $insertSizeStmt = $pdo->prepare("INSERT INTO product_sizes (product_id, size_id, stock) VALUES (?, ?, ?)");
-            $insertSizeStmt->execute([$product_id, $sizeId, $stock]);
+        if ($sizeId && $stock !== '' && is_numeric($stock)) {
+            $pdo->prepare("INSERT INTO product_sizes (product_id, size_id, stock) VALUES (?, ?, ?)")
+                ->execute([$product_id, $sizeId, $stock]);
         }
     }
+
+    // Commit transaction
+    $pdo->commit();
+
+    header("Location: edit_product.php?id=" . $product_id);
+    exit();
+} catch (Exception $e) {
+    $pdo->rollBack();
+    die("Error updating product: " . $e->getMessage());
 }
-
-
-// Commit the transaction
-$pdo->commit();
-
-// Redirect or display success message
-header("Location: edit_product.php?id=" . $product_id);
-exit();
