@@ -250,7 +250,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
 
-                    <button type="submit" name="change_password">Change Password</button>
+                    <button type="button" onclick="window.location.href='change_password.php';">
+                        Change Password
+                    </button>
                 </form>
 
                 <a href="../logout.php" class="logout-link">Logout</a>
