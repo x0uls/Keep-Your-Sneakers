@@ -48,6 +48,8 @@ try {
             display: flex;
             padding: 40px;
             margin-top: 100px;
+            align-items: flex-start;
+            /* Ensure proper alignment */
         }
 
         .sidebar {
@@ -59,6 +61,13 @@ try {
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
             height: fit-content;
             margin-right: 40px;
+            position: sticky;
+            top: 120px;
+            /* Adjust this based on your header height */
+            max-height: calc(100vh - 140px);
+            /* Prevent overflow */
+            overflow-y: auto;
+            /* Enable scrolling if content is too long */
         }
 
         .search-results-container {
@@ -166,9 +175,11 @@ try {
         }
 
         @media (max-width: 768px) {
-            .product {
-                width: calc(33.333% - 40px);
-                /* 3 items per row on tablets */
+            .sidebar {
+                position: static;
+                width: 100%;
+                margin-bottom: 20px;
+                max-height: none;
             }
         }
 
