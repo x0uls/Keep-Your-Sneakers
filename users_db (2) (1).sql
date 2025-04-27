@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 27, 2025 at 05:20 PM
+-- Generation Time: Apr 27, 2025 at 06:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -65,7 +65,7 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`user_id`, `product_id`, `size_id`, `quantity`, `category_id`) VALUES
-(30, 16, 1, 1, 1);
+(31, 12, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -178,7 +178,23 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `image`, `sold_cou
 (24, 'Air Jordan 1 Retro High OG \'Black Toe\'', 'The Air Jordan 1 Retro High remakes the classic sneaker, giving you a fresh look with a familiar feel. Premium materials with new colours and textures give modern expression to an all-time favourite.', 678.00, 'air-jordan-1-high-og-black-toe-dz5485-106-release-date (2).jpg', 0),
 (26, 'Nike Air Force 1 \'07', 'Comfortable, durable and timeless—it\'s number one for a reason. The classic \'80s construction pairs smooth leather with bold details for style that tracks whether you\'re on court or on the go.', 489.00, 'AIR+FORCE+1+\'07 (2).png', 0),
 (29, 'Nike Downshifter 13', 'Whether you\'re starting your running journey or an expert eager to switch up your pace, the Downshifter 13 is down for the ride. With a revamped upper, cushioning and durability, it helps you find that extra gear or take that first stride towards chasing down your goals.', 255.00, 'NIKE+DOWNSHIFTER+13 (3).png', 0),
-(30, 'Nike Pegasus 41', 'Responsive cushioning in the Pegasus provides an energised ride for everyday road running. Experience lighter-weight energy return with dual Air Zoom units and a ReactX foam midsole. Improved engineered mesh on the upper decreases weight and increases breathability.', 659.00, 'AIR+ZOOM+PEGASUS+41 (2).png', 0);
+(30, 'Nike Pegasus 41', 'Responsive cushioning in the Pegasus provides an energised ride for everyday road running. Experience lighter-weight energy return with dual Air Zoom units and a ReactX foam midsole. Improved engineered mesh on the upper decreases weight and increases breathability.', 659.00, 'AIR+ZOOM+PEGASUS+41 (2).png', 0),
+(31, 'Nike Air Max Dn', 'Say hello to the next generation of Air technology. The Air Max Dn features our Dynamic Air unit system of dual-pressure tubes, creating a bouncy sensation with every step. This results in a futuristic design that\'s comfortable enough to wear all day. Go ahead—Feel The Unreal.\r\n\r\n', 489.00, 'Nike Air Max Dn.png', 0),
+(32, 'Nike Court Borough Low Recraft', 'Start little ones off on the right foot with the new Court Borough. Made for the long haul, this \"recrafted\" legend uses a combination of durable materials on the upper and outsole to achieve a classic look made in a whole new way. A redesigned toe box and midfoot give feet a little extra room so little ones can run, jump and play just a bit longer and harder in comfort.\r\n\r\n', 285.00, 'Nike Court Borough Low Recraft.png', 0),
+(33, 'Nike Dunk Low', 'The Nike Dunk Low is an easy score for your kid\'s wardrobe. This mid-80s hoops icon returns with super-durable construction and original colours. Add in a rubber sole for traction and this one\'s a slam dunk for young sneakerheads.', 245.00, 'Nike Dunk Low.png', 0),
+(34, 'Nike IsoFly', 'Lace up the Nike IsoFly to help your little one feel lightweight and bouncy as they play. With durable traction, it provides sticky grip in the playground and inside on a hardwood court. The extra cushioning underfoot and breathable material up top help kids run and jump in comfort. Plus, a hook-and-loop strap and elastic laces help make getting them on an easy win.\r\n\r\n', 319.00, 'Nike IsoFly.png', 0),
+(35, 'Nike Mercurial Superfly 10 Elite', 'Obsessed with speed? So are the game\'s biggest stars. That\'s why we made this Elite boot with an improved 3/4-length Air Zoom unit. It gives you and the sport\'s fastest players the propulsive feel needed to break through the back line. The result is the most responsive Mercurial we\'ve ever made, because you demand greatness from yourself and your footwear.\r\n\r\n', 1299.00, 'Nike Mercurial Superfly 10 Elite.png', 0),
+(36, 'Nike Phantom Luna 2 Elite', 'Obsessed with perfecting your craft? We made this for you. In the middle of the storm, with chaos swirling all around you, you\'ve calmly found the final third of the pitch, thanks to your uncanny mix of on-ball guile and grace. Go and finish the job in the Phantom Luna 2 Elite. Revolutionary Nike Gripknit covers the striking area of the boot while Nike Cyclone 360 traction helps guide your unscripted agility. We design Elite boots for you and the world\'s biggest stars to give you high-level quality, because you demand greatness from yourself and your footwear.', 1299.00, 'Nike Phantom Luna 2 Elite.png', 0),
+(37, 'Nike Tiempo Legend 10 Academy', 'Even Legends find ways to evolve. Made to take your game to the next level, the latest iteration of this Academy boot has all-new FlyTouch Lite engineered leather. Softer than natural leather, it contours to your foot and doesn\'t overstretch, so you can dictate the pace of your game. Lighter and sleeker than any other Tiempo to date, the Legend 10 is for any position on the pitch, whether you\'re sending a pinpoint pass through the defence or tracking back to stop a break-away.', 455.00, 'Nike Tiempo Legend 10 Academy.png', 0),
+(38, 'Nike Phantom GX 2 Club', 'Whether you\'re starting out or just playing for fun, the Club boot gets you on the pitch without compromising on quality. Created with goals in mind, the Phantom GX 2 Club has a grippy texture covering the striking area of the boot and reliable traction to help guide your unscripted agility.\r\n\r\n', 245.00, 'Nike Phantom GX 2 Club.png', 0),
+(39, 'Nike Phantom GX 2 Elite \'Erling Haaland\'', 'Erling Haaland is inevitable. There\'s no stopping the goal-scoring force of nature with the game on the line. That\'s why he needs the Phantom GX 2 Elite. Its sticky Gripknit technology gives him the precision he needs to find the back of the net. With graphics inspired by natural phenomena like supernovas and meteor crashes, this special version speaks to the unpredictable force Erling is on the pitch.', 1199.00, 'Nike Phantom GX 2 Elite \'Erling Haaland\'.png', 0),
+(40, 'Nike Zoom Fly 6', 'The Zoom Fly 6 is with you every step of your run. Lighter than the Zoom Fly 5, its responsive ZoomX foam adds energy return to each stride, while a carbon-fibre plate helps propel you to the finishing line.', 789.00, 'Nike Zoom Fly 6.png', 0),
+(41, 'Nike Air Max INTRLK Lite', 'You\'ve got to feel the sensation to be the sensation. Enter the Air Max INTRLK. Rethought cushioning turns the page in comfort with increased responsiveness and the perfect amount of bounce. Lightweight, easy-to-style materials stand up to wear and tear. Finishing it off, the Waffle-inspired outsole adds true Nike zest.\r\n\r\n', 355.00, 'Nike Air Max INTRLK Lite.png', 0),
+(42, 'Nike Cortez Textile', 'One word: tradition. From heritage running to a fashion phenom, the Cortez\'s retro appeal, sponge-soft midsole and seesaw detailing deliver decade after decade. This iteration combines ribbon lacing and a monochromatic look for elevated style.', 469.00, 'Nike Cortez Textile.png', 0),
+(43, 'Nike Gamma Force', 'Layers upon layers of dimensional style—that\'s a force to be reckoned with. Offering both comfort and versatility, these kicks are rooted in heritage basketball culture. Collar materials pay homage to vintage sport while the subtle platform elevates your look, literally. The Gamma Force is forging its own legacy: court style that can be worn all day, wherever you go.\r\n\r\n', 395.00, 'Nike Gamma Force.png', 0),
+(44, 'Nike Victori One', 'From the beach to gardening to sitting on the sofa, the Nike Victori One perfects a classic design. Delivering lightweight comfort that\'s easy to wear, it features new softer, more responsive foam. The contoured grip pattern helps cradle and hold your foot in place.\r\n\r\n', 129.00, 'Nike Victori One.png', 0),
+(46, 'Nike SB Dunk Low Pro', 'An \'80s b-ball icon returns with classic details and throwback hoops flair. Channelling vintage style back onto the streets, the Nike SB Dunk features a padded low-cut collar that lets you comfortably take your game anywhere.\r\n\r\n', 489.00, 'Nike SB Dunk Low Pro.png', 0),
+(47, 'Nike ReactX Rejuven8', 'Give your feet a rest. Made from soft and responsive ReactX foam, the Rejuven8 uses some of our best tech to create a comfortable shoe you\'ll want to slip on every day.\r\n\r\n', 289.00, 'Nike ReactX Rejuven8.png', 0);
 
 -- --------------------------------------------------------
 
@@ -223,7 +239,26 @@ INSERT INTO `product_categories` (`id`, `product_id`, `category_id`) VALUES
 (68, 29, 1),
 (69, 29, 2),
 (70, 30, 1),
-(71, 30, 2);
+(71, 30, 2),
+(72, 31, 3),
+(73, 32, 3),
+(74, 33, 3),
+(75, 34, 3),
+(76, 35, 1),
+(77, 35, 3),
+(78, 36, 1),
+(79, 37, 1),
+(80, 38, 1),
+(81, 39, 1),
+(82, 39, 3),
+(83, 40, 2),
+(84, 41, 2),
+(85, 42, 2),
+(86, 43, 2),
+(87, 44, 2),
+(89, 46, 1),
+(90, 46, 3),
+(91, 47, 3);
 
 -- --------------------------------------------------------
 
@@ -470,7 +505,198 @@ INSERT INTO `product_sizes` (`id`, `product_id`, `size_id`, `stock`) VALUES
 (331, 30, 18, 23),
 (332, 30, 19, 24),
 (333, 30, 20, 643),
-(334, 30, 23, 26);
+(334, 30, 23, 26),
+(335, 31, 24, 12),
+(336, 31, 25, 14),
+(337, 31, 26, 12),
+(338, 31, 27, 13),
+(339, 31, 28, 12),
+(340, 31, 29, 15),
+(341, 31, 30, 16),
+(342, 31, 31, 11),
+(343, 32, 24, 11),
+(344, 32, 25, 0),
+(345, 32, 26, 0),
+(346, 32, 27, 12),
+(347, 32, 28, 0),
+(348, 32, 29, 0),
+(349, 32, 30, 0),
+(350, 32, 31, 5),
+(351, 33, 24, 12),
+(352, 33, 25, 12),
+(353, 33, 26, 0),
+(354, 33, 27, 11),
+(355, 33, 28, 6),
+(356, 33, 29, 15),
+(357, 33, 30, 16),
+(358, 33, 31, 11),
+(359, 34, 24, 12),
+(360, 34, 25, 14),
+(361, 34, 26, 15),
+(362, 34, 27, 12),
+(363, 34, 28, 11),
+(364, 34, 29, 10),
+(365, 34, 30, 0),
+(366, 34, 31, 2),
+(367, 35, 1, 12),
+(368, 35, 2, 11),
+(369, 35, 3, 19),
+(370, 35, 4, 15),
+(371, 35, 5, 16),
+(372, 35, 6, 12),
+(373, 35, 7, 10),
+(374, 35, 8, 11),
+(375, 35, 9, 11),
+(376, 35, 10, 14),
+(377, 35, 11, 6),
+(378, 35, 12, 7),
+(379, 35, 24, 11),
+(380, 35, 25, 12),
+(381, 35, 26, 16),
+(382, 35, 27, 17),
+(383, 35, 28, 12),
+(384, 35, 29, 19),
+(385, 35, 30, 2),
+(386, 35, 31, 10),
+(387, 36, 1, 12),
+(388, 36, 2, 11),
+(389, 36, 3, 17),
+(390, 36, 4, 16),
+(391, 36, 5, 10),
+(392, 36, 6, 9),
+(393, 36, 7, 12),
+(394, 36, 8, 15),
+(395, 36, 9, 12),
+(396, 36, 10, 13),
+(397, 36, 11, 16),
+(398, 36, 12, 10),
+(399, 37, 1, 0),
+(400, 37, 2, 0),
+(401, 37, 3, 0),
+(402, 37, 4, 0),
+(403, 37, 5, 12),
+(404, 37, 6, 15),
+(405, 37, 7, 16),
+(406, 37, 8, 12),
+(407, 37, 9, 22),
+(408, 37, 10, 16),
+(409, 37, 11, 17),
+(410, 37, 12, 6),
+(411, 38, 1, 0),
+(412, 38, 2, 0),
+(413, 38, 3, 12),
+(414, 38, 4, 0),
+(415, 38, 5, 15),
+(416, 38, 6, 16),
+(417, 38, 7, 21),
+(418, 38, 8, 16),
+(419, 38, 9, 17),
+(420, 38, 10, 0),
+(421, 38, 11, 1),
+(422, 38, 12, 24),
+(423, 39, 1, 12),
+(424, 39, 2, 11),
+(425, 39, 3, 11),
+(426, 39, 4, 17),
+(427, 39, 5, 16),
+(428, 39, 6, 18),
+(429, 39, 7, 14),
+(430, 39, 8, 15),
+(431, 39, 9, 8),
+(432, 39, 10, 21),
+(433, 39, 11, 7),
+(434, 39, 12, 10),
+(435, 39, 24, 4),
+(436, 39, 25, 4),
+(437, 39, 26, 5),
+(438, 39, 27, 17),
+(439, 39, 28, 15),
+(440, 39, 29, 7),
+(441, 39, 30, 1),
+(442, 39, 31, 12),
+(443, 40, 13, 5),
+(444, 40, 14, 0),
+(445, 40, 15, 15),
+(446, 40, 16, 12),
+(447, 40, 17, 19),
+(448, 40, 18, 6),
+(449, 40, 19, 10),
+(450, 40, 20, 12),
+(451, 40, 21, 0),
+(452, 40, 22, 11),
+(453, 40, 23, 11),
+(454, 41, 13, 15),
+(455, 41, 14, 12),
+(456, 41, 15, 10),
+(457, 41, 16, 11),
+(458, 41, 17, 19),
+(459, 41, 18, 15),
+(460, 41, 19, 22),
+(461, 41, 20, 16),
+(462, 41, 21, 12),
+(463, 41, 22, 9),
+(464, 41, 23, 12),
+(465, 42, 13, 12),
+(466, 42, 14, 15),
+(467, 42, 15, 0),
+(468, 42, 16, 12),
+(469, 42, 17, 0),
+(470, 42, 18, 18),
+(471, 42, 19, 12),
+(472, 42, 20, 19),
+(473, 42, 21, 11),
+(474, 42, 22, 8),
+(475, 42, 23, 10),
+(476, 43, 13, 0),
+(477, 43, 14, 12),
+(478, 43, 15, 13),
+(479, 43, 16, 15),
+(480, 43, 17, 11),
+(481, 43, 18, 9),
+(482, 43, 19, 12),
+(483, 43, 20, 18),
+(484, 43, 21, 19),
+(485, 43, 22, 15),
+(486, 43, 23, 16),
+(487, 44, 13, 2),
+(488, 44, 14, 11),
+(489, 44, 15, 10),
+(490, 44, 16, 19),
+(491, 44, 17, 18),
+(492, 44, 18, 17),
+(493, 44, 19, 16),
+(494, 44, 20, 15),
+(495, 44, 21, 14),
+(496, 44, 22, 9),
+(497, 44, 23, 16),
+(509, 46, 1, 11),
+(510, 46, 2, 10),
+(511, 46, 3, 9),
+(512, 46, 4, 8),
+(513, 46, 5, 12),
+(514, 46, 6, 12),
+(515, 46, 7, 21),
+(516, 46, 8, 19),
+(517, 46, 9, 18),
+(518, 46, 10, 15),
+(519, 46, 11, 10),
+(520, 46, 12, 12),
+(521, 46, 24, 19),
+(522, 46, 25, 18),
+(523, 46, 26, 10),
+(524, 46, 27, 12),
+(525, 46, 28, 0),
+(526, 46, 29, 0),
+(527, 46, 30, 12),
+(528, 46, 31, 8),
+(529, 47, 24, 0),
+(530, 47, 25, 0),
+(531, 47, 26, 0),
+(532, 47, 27, 0),
+(533, 47, 28, 8),
+(534, 47, 29, 12),
+(535, 47, 30, 9),
+(536, 47, 31, 12);
 
 -- --------------------------------------------------------
 
@@ -740,19 +966,19 @@ ALTER TABLE `order_items`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `product_categories`
 --
 ALTER TABLE `product_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 
 --
 -- AUTO_INCREMENT for table `product_sizes`
 --
 ALTER TABLE `product_sizes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=335;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=537;
 
 --
 -- AUTO_INCREMENT for table `sizes`
