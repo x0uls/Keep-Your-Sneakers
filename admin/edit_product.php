@@ -132,7 +132,7 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
         }
 
         .image-preview {
-            max-width: 100%;
+            max-width: 50%;
             border-radius: 12px;
             margin-top: 15px;
         }
@@ -186,7 +186,7 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
             </select>
 
             <label>Product Image</label>
-            <img src="/products/<?= htmlspecialchars($product['image']) ?>" alt="Product Image" class="image-preview">
+            <img src="/products/<?= htmlspecialchars($product['image']) ?>" alt="Product Image" class="image-preview"><br>
 
             <input type="file" name="product_image" accept="image/*">
 

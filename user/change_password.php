@@ -5,6 +5,7 @@ require '../lib/PHPMailer.php';
 require '../lib/SMTP.php';
 require '../lib/Exception.php';
 require '../vendor/autoload.php'; // if using Composer, include this
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -79,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            padding: 40px;
             background: #f5f5f5;
         }
 
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         input[type="password"] {
-            width: 100%;
+            width: 474px;
             padding: 12px;
             margin-top: 10px;
             margin-bottom: 20px;

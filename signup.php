@@ -41,6 +41,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <style>
+    body {
+        background-color: #f5f5f5;
+    }
+
     .signup-container {
         max-width: 400px;
         margin: 60px auto;
