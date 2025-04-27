@@ -204,18 +204,17 @@ try {
             <h3>Filter by Price</h3>
             <div class="filter-form">
                 <form method="GET" action="search.php" id="filterForm">
+                    <!-- Include query parameter as hidden field -->
                     <input type="hidden" name="query" value="<?= htmlspecialchars($search) ?>">
 
                     <div class="price-input">
                         <span>RM</span>
-                        <input type="number" name="min_price" placeholder="Min Price" id="minPrice"
-                            value="<?= $filter->getMinPrice() !== null ? $filter->getMinPrice() : '' ?>">
+                        <input type="number" name="min_price" placeholder="Min Price" id="minPrice" value="<?= $filter->getMinPrice() !== null ? $filter->getMinPrice() : '' ?>">
                     </div>
 
                     <div class="price-input">
                         <span>RM</span>
-                        <input type="number" name="max_price" placeholder="Max Price" id="maxPrice"
-                            value="<?= $filter->getMaxPrice() !== null ? $filter->getMaxPrice() : '' ?>">
+                        <input type="number" name="max_price" placeholder="Max Price" id="maxPrice" value="<?= $filter->getMaxPrice() !== null ? $filter->getMaxPrice() : '' ?>">
                     </div>
 
                     <div>
@@ -240,7 +239,7 @@ try {
                         </select>
                     </div>
 
-                    <button type="button" onclick="submitFilterForm()">Apply Filter</button>
+                    <button type="submit">Apply Filter</button>
                 </form>
             </div>
         </div>
@@ -250,39 +249,32 @@ try {
             <h2>Search Results</h2>
 
             <?php if ($result && count($result) > 0): ?>
-                <?php foreach ($result as $row): ?>
+                <?php
+                $uniqueProducts = [];
+                foreach ($result as $row) {
+                    if (!isset($uniqueProducts[$row['id']])) {
+                        $uniqueProducts[$row['id']] = $row;
+                    }
+                }
+                ?>
+
+                <?php foreach ($uniqueProducts as $row): ?>
                     <a href="product_page.php?id=<?= $row['id'] ?>" class="product">
                         <img src="/products/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['name']) ?>">
                         <h3><?= htmlspecialchars($row['name']) ?></h3>
+                        <p style="font-size: 14px; color: #777; margin: 5px 0;"><?= htmlspecialchars($row['category_name']) ?></p>
                         <p>RM <?= number_format($row['price'], 2) ?></p>
                         <span class="product-button">View Product</span>
                     </a>
                 <?php endforeach; ?>
+
             <?php else: ?>
                 <p class="no-results">No products found.</p>
             <?php endif; ?>
         </div>
 
         <!-- JavaScript remains the same -->
-        <script>
-            function submitFilterForm() {
-                const form = document.getElementById('filterForm');
-                const formData = new FormData(form);
-                const params = new URLSearchParams();
-
-                for (const [key, value] of formData.entries()) {
-                    if (value !== '' && value !== null) {
-                        params.append(key, value);
-                    }
-                }
-
-                window.location.href = 'search.php?' + params.toString();
-            }
-
-            document.getElementById('categorySelect').addEventListener('change', function() {
-                submitFilterForm();
-            });
-        </script>
+        <script src="js/filter.js"></script>
     </div>
 </body>
 
