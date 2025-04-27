@@ -11,6 +11,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Initialize success message
+$success_message = '';
+
 // Check if the 'id' parameter is set in the URL
 if (isset($_GET['id'])) {
     $address_id = $_GET['id'];
@@ -29,12 +32,46 @@ if (isset($_GET['id'])) {
         echo "Address not found.";
         exit;
     }
+
+    // Handle form submission for updating the address
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $address_line1 = $_POST['address_line1'];
+        $address_line2 = $_POST['address_line2'];
+        $city = $_POST['city'];
+        $postal_code = $_POST['postal_code'];
+        $country = $_POST['country'];
+
+        // Update the address in the database
+        try {
+            $updateSql = "UPDATE addresses SET 
+                address_line1 = :address_line1,
+                address_line2 = :address_line2,
+                city = :city,
+                postal_code = :postal_code,
+                country = :country
+                WHERE id = :address_id AND user_id = :user_id";
+
+            $updateStmt = $pdo->prepare($updateSql);
+            $updateStmt->bindParam(':address_line1', $address_line1);
+            $updateStmt->bindParam(':address_line2', $address_line2);
+            $updateStmt->bindParam(':city', $city);
+            $updateStmt->bindParam(':postal_code', $postal_code);
+            $updateStmt->bindParam(':country', $country);
+            $updateStmt->bindParam(':address_id', $address_id, PDO::PARAM_INT);
+            $updateStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $updateStmt->execute();
+
+            // Set success message
+            $success_message = "Address updated successfully.";
+        } catch (PDOException $e) {
+            echo "Error updating address: " . $e->getMessage();
+        }
+    }
 } else {
     // If no address ID is provided, show an error or redirect
     echo "No address ID provided.";
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -102,6 +139,16 @@ if (isset($_GET['id'])) {
             background-color: #333;
         }
 
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .form-container {
                 padding: 20px;
@@ -109,10 +156,19 @@ if (isset($_GET['id'])) {
             }
         }
     </style>
+    <script>
+        // Redirect to checkout page after 5 seconds
+        setTimeout(function() {
+            window.location.href = 'checkout.php'; // Redirect URL
+        }, 5000);
+    </script>
 </head>
 
 <body>
     <div class="form-container">
+        <?php if ($success_message): ?>
+            <div class="success-message"><?php echo $success_message; ?></div>
+        <?php endif; ?>
         <h2>Edit Address</h2>
         <form method="POST">
             <label for="address_line1">Address Line 1:</label>
