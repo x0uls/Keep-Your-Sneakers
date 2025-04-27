@@ -147,7 +147,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <h2>Payment Method</h2>
                 <div style="margin-bottom: 20px;">
-                    <input type="radio" name="payment_method" value="cod" checked onclick="setPaymentMethod('cod')"> Cash on Delivery<br>
                     <input type="radio" name="payment_method" value="online" onclick="setPaymentMethod('online')"> Online Banking<br>
                     <input type="radio" name="payment_method" value="card" onclick="setPaymentMethod('card')"> Credit/Debit Card
                 </div>
