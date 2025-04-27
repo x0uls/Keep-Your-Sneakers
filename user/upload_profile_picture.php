@@ -43,9 +43,14 @@ if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 
 
             // Delete old image if it's not the default
             if ($currentPic && $currentPic !== 'default-profile-icon.png') {
-                $old_path = 'profilepic/' . $currentPic;
+                // Assuming profilepic is in the root folder
+                $old_path = '../profilepic/' . $currentPic; // Correcting the path
                 if (file_exists($old_path)) {
-                    unlink($old_path); // Delete the old file
+                    if (unlink($old_path)) {
+                        // File successfully deleted
+                    } else {
+                        echo "Error: Could not delete the old profile picture.";
+                    }
                 }
             }
         } catch (PDOException $e) {

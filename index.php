@@ -21,7 +21,8 @@ try {
 
         <!-- Ad Space Section -->
         <div class="ad-space">
-            <img src=/images/LEBRON.png alt="Advertisement" style="width: 100%; height: 100%;">
+            <a href="product_page.php?id=11">
+                <img src=/images/LEBRON.png alt="Advertisement" style="width: 100%; height: 100%;">
         </div>
 
         <!-- Top 5 Bestsellers Section -->
