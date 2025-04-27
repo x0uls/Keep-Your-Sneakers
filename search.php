@@ -1,18 +1,29 @@
 <?php
 session_start();
-require 'db.php'; // Database connection
+require 'db.php';
+require 'filter.php'; // Our new filter class
 include '_head.php';
+include '_base.php';
 
-if (isset($_GET['query'])) {
-    $search = $conn->real_escape_string($_GET['query']); // Prevent SQL injection
-    $sql = "SELECT * FROM products 
-            WHERE name LIKE '%$search%' 
-            OR description LIKE '%$search%' 
-            OR category LIKE '%$search%'";
+try {
+    $filter = new ProductFilter($pdo);
 
-    $result = $conn->query($sql);
-} else {
+    if (isset($_GET['query'])) {
+        $filter->applyFilters($_GET);
+    }
+
+    $result = $filter->getResults();
+    $categories = $filter->getCategories();
+    $sizes = $filter->getSizes();
+    $search = $filter->getSearchTerm();
+    $category_id = $filter->getCurrentCategory();
+    $size_id = $filter->getCurrentSize();
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
     $result = null;
+    $search = '';
+    $categories = [];
+    $sizes = [];
 }
 ?>
 
@@ -23,28 +34,252 @@ if (isset($_GET['query'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/filter.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            padding: 40px;
+            align-items: flex-start;
+            /* Ensure proper alignment */
+        }
+
+        .sidebar {
+            width: 200px;
+            min-width: 200px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            margin-right: 40px;
+            position: sticky;
+            top: 120px;
+            /* Adjust this based on your header height */
+            max-height: calc(100vh - 140px);
+            /* Prevent overflow */
+            overflow-y: auto;
+            /* Enable scrolling if content is too long */
+        }
+
+        .search-results-container {
+            flex: 1;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 30px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .product {
+            display: inline-block;
+            width: calc(33% - 40px);
+            /* Adjust to 1/3 width */
+            margin: 20px;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+        }
+
+
+        .product:hover {
+            transform: scale(1.05, 1.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .product img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .product h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .product p {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .no-results {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 400;
+            color: #999;
+        }
+
+        .price-input {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .price-input span {
+            position: absolute;
+            left: 10px;
+            top: 40%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .price-input input {
+            width: 100%;
+            padding: 10px 10px 10px 30px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                margin-bottom: 20px;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product {
+                width: calc(100% - 20px);
+                /* 1 item per row on mobile */
+                margin: 10px 0;
+            }
+
+            h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="container">
+        <!-- Sidebar Filter -->
+        <div class="sidebar">
+            <h3>Filter by Price</h3>
+            <div class="filter-form">
+                <form method="GET" action="search.php" id="filterForm">
+                    <!-- Include query parameter as hidden field -->
+                    <input type="hidden" name="query" value="<?= htmlspecialchars($search) ?>">
 
-    <h2>Search Results</h2>
+                    <div class="price-input">
+                        <span>RM</span>
+                        <input type="number" name="min_price" placeholder="Min Price" id="minPrice" value="<?= $filter->getMinPrice() !== null ? $filter->getMinPrice() : '' ?>">
+                    </div>
 
-    <?php
-    if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo '<a href="product_page.php?id=' . $row['id'] . '" class="product">';
-            echo '<img src="' . $row['image'] . '" alt="' . $row['name'] . '">';
-            echo '<h3>' . $row['name'] . '</h3>';
-            echo '<p>Price: RM' . $row['price'] . '</p>';
-            echo '</a>';
-        }
-    } else {
-        echo "<p>No products found for '$search'</p>";
-    }
-    ?>
+                    <div class="price-input">
+                        <span>RM</span>
+                        <input type="number" name="max_price" placeholder="Max Price" id="maxPrice" value="<?= $filter->getMaxPrice() !== null ? $filter->getMaxPrice() : '' ?>">
+                    </div>
 
-    <?php include '_foot.php'; ?>
+                    <div>
+                        <select name="category" id="categorySelect">
+                            <option value="">Select Category</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category['id'] ?>" <?= $category_id == $category['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($category['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
+                    <div>
+                        <select name="size" id="sizeSelect" <?= empty($sizes) ? 'disabled' : '' ?>>
+                            <option value="">Select Size</option>
+                            <?php foreach ($sizes as $size): ?>
+                                <option value="<?= $size['id'] ?>" <?= $size_id == $size['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($size['size_label']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <button type="submit">Apply Filter</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="search-results-container">
+            <h2>
+                <?php
+                // Determine the category name based on the selected category ID
+                $category_name = '';
+                if (!empty($category_id)) {
+                    foreach ($categories as $category) {
+                        if ($category['id'] == $category_id) {
+                            $category_name = $category['name'];
+                            break;
+                        }
+                    }
+                }
+
+                // Determine the message based on the presence of query and category
+                if (!empty($search) && !empty($category_id)) {
+                    echo 'Searching for "' . htmlspecialchars($search) . '" in "' . htmlspecialchars($category_name) . '"';
+                } elseif (!empty($search)) {
+                    echo 'Searching for "' . htmlspecialchars($search) . '"';
+                } elseif (!empty($category_name)) {
+                    echo htmlspecialchars($category_name) . "'s" . ' Category';
+                } else {
+                    echo 'Search Results';
+                }
+                ?>
+            </h2>
+            <?php if ($result && count($result) > 0): ?>
+                <?php
+                $uniqueProducts = [];
+                foreach ($result as $row) {
+                    if (!isset($uniqueProducts[$row['id']])) {
+                        $uniqueProducts[$row['id']] = $row;
+                    }
+                }
+                ?>
+
+                <?php foreach ($uniqueProducts as $row): ?>
+                    <a href="product_page.php?id=<?= $row['id'] ?>" class="product">
+                        <img src="/products/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['name']) ?>">
+                        <h3><?= htmlspecialchars($row['name']) ?></h3>
+                        <p style="font-size: 14px; color: #777; margin: 5px 0;"><?= htmlspecialchars($row['category_name']) ?></p>
+                        <p>RM <?= number_format($row['price'], 2) ?></p>
+                    </a>
+                <?php endforeach; ?>
+
+            <?php else: ?>
+                <p class="no-results">No products found.</p>
+            <?php endif; ?>
+        </div>
+
+        <!-- JavaScript remains the same -->
+        <script src="js/filter.js"></script>
+    </div>
 </body>
 
 </html>

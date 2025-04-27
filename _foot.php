@@ -1,4 +1,4 @@
 <footer>
-        Developed by <b>FOOT LOCKERS</b> &middot;
+        Developed by <b>Keep Your Sneakers</b> &middot;
         Copyrighted &copy; <?= date('Y') ?>
 </footer>

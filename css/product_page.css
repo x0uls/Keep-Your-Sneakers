@@ -1,0 +1,113 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #fff;
+}
+
+.product-container {
+    display: flex;
+    gap: 50px;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+.product-img {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.product-img img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-info h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.product-info p {
+    font-size: 16px;
+    margin: 6px 0;
+    margin-bottom:10px;
+}
+
+.price {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.add-to-cart {
+    background-color: #111;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    margin-top: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background-color: #333;
+}
+
+.add-to-wishlist {
+    background-color: #fff;
+    color: #111; /* Black text to match the contrast */
+    border: 2px solid #111; /* Border to match the text color */
+    padding: 15px 30px;
+    margin-top: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.add-to-wishlist:hover {
+    background-color: #f0f0f0; /* Slight gray background on hover */
+    color: #111; /* Keep text color black when hovered */
+}
+
+.category-buttons,
+.size-selection {
+    margin-bottom: 20px;
+}
+
+.category-buttons button,
+.size-selection button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    background: #f9f9f9;
+    transition: background 0.3s ease;
+}
+
+
+.category-buttons button.active,
+.size-selection button.active {
+    background: #111;
+    color: #fff;
+}
+
+.size-selection button:hover {
+    background: #eee;
+}
+
+.size-selection button.active:hover {
+    background: #111; /* Keep it black even when hovered */
+}

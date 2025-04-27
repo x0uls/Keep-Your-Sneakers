@@ -1,0 +1,37 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.product-details {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+}
+
+.category-buttons {
+    margin-top: 20px;
+}
+
+.category-btn {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.category-btn:hover {
+    background-color: #0056b3;
+}
+
+#sizes-container {
+    margin-top: 20px;
+}
