@@ -23,6 +23,7 @@ try {
         <div class="ad-space">
             <a href="product_page.php?id=11">
                 <img src=/images/LEBRON.png alt="Advertisement" style="width: 100%; height: 100%;">
+            </a>
         </div>
 
         <!-- Top 5 Bestsellers Section -->
@@ -94,8 +95,9 @@ try {
 
     .bestsellers-container {
         display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 40px;
     }
 
     .bestseller-item {
