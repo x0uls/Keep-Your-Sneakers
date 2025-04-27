@@ -190,8 +190,8 @@ if (isset($_SESSION['user_id'])) {
     }
 
     .wishlist-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: scale(1.05, 1.05);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     }
 
     /* Wishlist Item Image */

@@ -86,6 +86,13 @@ try {
 </body>
 
 <style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+
     /* Bestsellers Section Styles */
     .bestsellers-section {
         margin-top: 40px;

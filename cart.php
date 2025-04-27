@@ -108,6 +108,13 @@ if (isset($_SESSION['user_id'])) {
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
         #cartContainer {
             font-family: 'Poppins', sans-serif;
             color: #111;

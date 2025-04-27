@@ -90,8 +90,8 @@ try {
 
 
         .product:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05, 1.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
         }
 
         .product img {
