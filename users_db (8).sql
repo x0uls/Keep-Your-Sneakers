@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 27, 2025 at 05:37 AM
+-- Generation Time: Apr 27, 2025 at 12:59 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,8 @@ CREATE TABLE `addresses` (
 --
 
 INSERT INTO `addresses` (`id`, `user_id`, `address_line1`, `address_line2`, `city`, `postal_code`, `country`, `type`) VALUES
-(1, 30, 'B-07-05', 'PPR PINGGIRAN BUKIT JALIL', 'Kuala Lumpur', '58000', 'Malaysia', 'billing');
+(1, 30, 'B-07-05', 'PPR PINGGIRAN BUKIT JALIL', 'Kuala Lumpur', '58000', 'Malaysia', 'billing'),
+(4, 31, 'B-07-05', 'PPR PINGGIRAN BUKIT JALIL', 'Kuala Lumpur', '58000', 'Malaysia', 'billing');
 
 -- --------------------------------------------------------
 
@@ -58,14 +59,6 @@ CREATE TABLE `cart` (
   `quantity` int(11) DEFAULT 1,
   `category_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `cart`
---
-
-INSERT INTO `cart` (`user_id`, `product_id`, `size_id`, `quantity`, `category_id`) VALUES
-(30, 4, 11, 1, 1),
-(31, 3, 8, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -126,7 +119,8 @@ INSERT INTO `orders` (`id`, `user_id`, `payment_id`, `order_date`, `payment_stat
 (29, 30, 'pi_3RI6RsQM571Me8gB0xyYhgZ1', '2025-04-26 11:00:35', 'Paid', 'Pending', 'B-07-05, PPR PINGGIRAN BUKIT JALIL, 58000 Kuala Lumpur, Malaysia'),
 (30, 30, 'pi_3RI6RsQM571Me8gB0xyYhgZ1', '2025-04-26 11:00:41', 'Paid', 'Pending', 'B-07-05, PPR PINGGIRAN BUKIT JALIL, 58000 Kuala Lumpur, Malaysia'),
 (31, 30, 'pi_3RI6RsQM571Me8gB0xyYhgZ1', '2025-04-26 11:00:45', 'Paid', 'Pending', 'B-07-05, PPR PINGGIRAN BUKIT JALIL, 58000 Kuala Lumpur, Malaysia'),
-(32, 30, 'pi_3RI6VjQM571Me8gB0Te0Mqdx', '2025-04-26 11:03:14', 'Paid', 'Shipped', 'B-07-05, PPR PINGGIRAN BUKIT JALIL, 58000 Kuala Lumpur, Malaysia');
+(32, 30, 'pi_3RI6VjQM571Me8gB0Te0Mqdx', '2025-04-26 11:03:14', 'Paid', 'Shipped', 'B-07-05, PPR PINGGIRAN BUKIT JALIL, 58000 Kuala Lumpur, Malaysia'),
+(33, 30, 'pi_3RISiNQM571Me8gB0d7cEg1l', '2025-04-27 10:45:51', 'Paid', 'Pending', 'B-07-05, PPR PINGGIRAN BUKIT JALIL, 58000 Kuala Lumpur, Malaysia');
 
 -- --------------------------------------------------------
 
@@ -143,25 +137,6 @@ CREATE TABLE `order_items` (
   `price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `order_items`
---
-
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `size_id`, `quantity`, `price`) VALUES
-(13, 11, 3, 9, 1, 300.00),
-(14, 12, 3, 9, 4, 300.00),
-(15, 13, 3, 8, 4, 1200.00),
-(18, 16, 3, 8, 3, 900.00),
-(19, 17, 3, 8, 4, 1200.00),
-(20, 18, 3, 8, 3, 900.00),
-(22, 20, 3, 8, 1, 300.00),
-(23, 21, 3, 8, 1, 300.00),
-(24, 22, 3, 8, 1, 300.00),
-(25, 23, 3, 8, 1, 300.00),
-(26, 25, 3, 8, 1, 300.00),
-(30, 29, 3, 8, 1, 300.00),
-(31, 32, 4, 11, 2, 2.00);
-
 -- --------------------------------------------------------
 
 --
@@ -177,17 +152,6 @@ CREATE TABLE `products` (
   `sold_count` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `products`
---
-
-INSERT INTO `products` (`id`, `name`, `description`, `price`, `image`, `sold_count`) VALUES
-(3, 'dwadwa', 'When you play all day, you need shoes that can keep up. Made for life on the go, these reimagine the best of the AJ4 with a focus on comfort and durability. Max Air helps cushion every step. Plus, parts of the upper were blended into a strong, flexible cage that wraps the shoe to add some toughness to your everyday play.\r\n\r\n\r\nColour Shown: Sail/White/Coconut Milk/Black&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;lt;br&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt;\r\nStyle: FQ7938-100\r\nCountry/Region of Origin: Indonesia', 300.00, '680d925d3b34a_AJ4.jpg', 0),
-(4, 'test', 'test', 1.00, '680cc820428cd_6804997766b68.png', 0),
-(5, 'test2', 'test2', 2.00, 'cart.png', 0),
-(6, 'test3', 'test3', 2.00, '680d925d3b34a_AJ4.jpg', 0),
-(7, 'test3', 'test3', 1.00, 'cart.png', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -199,17 +163,6 @@ CREATE TABLE `product_categories` (
   `product_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `product_categories`
---
-
-INSERT INTO `product_categories` (`id`, `product_id`, `category_id`) VALUES
-(10, 4, 1),
-(11, 5, 1),
-(12, 3, 1),
-(13, 6, 1),
-(14, 7, 1);
 
 -- --------------------------------------------------------
 
@@ -223,19 +176,6 @@ CREATE TABLE `product_sizes` (
   `size_id` int(11) NOT NULL,
   `stock` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `product_sizes`
---
-
-INSERT INTO `product_sizes` (`id`, `product_id`, `size_id`, `stock`) VALUES
-(15, 3, 8, 45),
-(16, 3, 9, 4),
-(17, 3, 7, 0),
-(18, 4, 11, 10),
-(19, 5, 1, 1),
-(20, 6, 1, 1),
-(21, 7, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -334,7 +274,9 @@ INSERT INTO `tokens` (`id`, `user_id`, `token`, `token_type`, `expires_at`) VALU
 (40, 30, '53f6a38be3918a5d6d2ae383bb8d84e168ccee30', 'reset', '2025-04-26 14:03:15'),
 (41, 30, '515f873a6ebb6ccb3ed6c44f7b4cea9b2c9ba946', 'reset', '2025-04-26 14:03:18'),
 (42, 30, 'c8104b0192d501d2033334edb0a0bde32ad6ca0e', 'reset', '2025-04-26 14:03:21'),
-(43, 30, 'e9c8e069e6c6d74d08fc80a60a3cf855d4bfceed', 'reset', '2025-04-26 14:03:45');
+(43, 30, 'e9c8e069e6c6d74d08fc80a60a3cf855d4bfceed', 'reset', '2025-04-26 14:03:45'),
+(45, 30, '7e45eb324066fcdf90c73a6f2a0ee444ce2a8730', 'reset', '2025-04-27 12:16:37'),
+(46, 30, 'dde8193547a199a681cc2c2d249f1a04eb24e9c2', 'reset', '2025-04-27 12:18:36');
 
 -- --------------------------------------------------------
 
@@ -359,9 +301,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`, `is_admin`, `profile_picture`, `failed_attempts`, `last_attempt_time`) VALUES
-(30, 'x0uls', 'kennykoh20061027@gmail.com', '$2y$10$R3dy6juB5PFWc7V4YPeYluxz9w0sdK.9GZZyct.falK4YIuX3uPOi', '2025-04-20 05:52:05', 0, '6809b9a422cbc.png', 0, NULL),
-(31, 'admin1', 'admin@gmail.com', '9d25cff3b5eb849da42581b8011128d44027d07e', '2025-04-21 02:25:36', 1, '680cb92c5d1a0.png', 0, NULL),
-(33, 'Gabriel', 'gabrielaugustin1004@gmail.com', '$2y$10$HHjrUAc0Qx5DdY2QASAwkuvvjPYoNB2QvvDHYUO6gPplPAhcFwXYO', '2025-04-26 14:25:58', 0, NULL, 11, '2025-04-26 22:31:35');
+(30, 'x0uls', 'kennykoh20061027@gmail.com', '8ee396cfbac4eaf092c01855c35fdb9675535551', '2025-04-20 05:52:05', 0, '6809b9a422cbc.png', 0, NULL),
+(31, 'admin1', 'admin@gmail.com', '9d25cff3b5eb849da42581b8011128d44027d07e', '2025-04-21 02:25:36', 1, '680cb92c5d1a0.png', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -373,7 +314,8 @@ CREATE TABLE `wishlist` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `size_id` int(11) DEFAULT NULL,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -466,7 +408,10 @@ ALTER TABLE `users`
 -- Indexes for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_wishlist` (`user_id`,`product_id`,`size_id`),
+  ADD KEY `size_id` (`size_id`),
+  ADD KEY `wishlist_ibfk_2` (`product_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -476,7 +421,7 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `addresses`
 --
 ALTER TABLE `addresses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -488,31 +433,31 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `product_categories`
 --
 ALTER TABLE `product_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `product_sizes`
 --
 ALTER TABLE `product_sizes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `sizes`
@@ -524,7 +469,7 @@ ALTER TABLE `sizes`
 -- AUTO_INCREMENT for table `tokens`
 --
 ALTER TABLE `tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -536,7 +481,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -553,7 +498,6 @@ ALTER TABLE `addresses`
 --
 ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   ADD CONSTRAINT `cart_ibfk_3` FOREIGN KEY (`size_id`) REFERENCES `sizes` (`id`),
   ADD CONSTRAINT `fk_cart_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_cart_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
@@ -571,7 +515,7 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `order_items_ibfk_3` FOREIGN KEY (`size_id`) REFERENCES `sizes` (`id`);
 
 --
@@ -599,6 +543,14 @@ ALTER TABLE `sizes`
 --
 ALTER TABLE `tokens`
   ADD CONSTRAINT `tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `wishlist_ibfk_3` FOREIGN KEY (`size_id`) REFERENCES `sizes` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
