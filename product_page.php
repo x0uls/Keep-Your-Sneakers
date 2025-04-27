@@ -16,8 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category'])) {
         // Query for available sizes for the given product and category
         $size_stmt = $pdo->prepare("SELECT s.size_label, ps.stock FROM sizes s
                                     JOIN product_sizes ps ON s.id = ps.size_id
-                                    WHERE ps.product_id = :product_id");
+                                    WHERE ps.product_id = :product_id AND s.category_id = :category_id");
         $size_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $size_stmt->bindParam(':category_id', $category_data['id'], PDO::PARAM_INT);
         $size_stmt->execute();
         $sizes = $size_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -75,7 +76,6 @@ if (isset($_GET['id'])) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="/css/product_page.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
 </head>
 
 <body>
@@ -88,7 +88,8 @@ if (isset($_GET['id'])) {
         <div class="product-info">
             <h2><?php echo htmlspecialchars($product['name']); ?></h2>
             <p class="price">RM<?php echo htmlspecialchars($product['price']); ?></p>
-            <p><?php echo htmlspecialchars($product['description']); ?></p>
+            <!-- Render description as HTML -->
+            <p><?php echo $product['description']; ?></p>
 
             <!-- Category Buttons -->
             <div class="category-buttons">
@@ -114,6 +115,14 @@ if (isset($_GET['id'])) {
                 data-price="<?php echo htmlspecialchars($product['price']); ?>"
                 data-image="<?php echo htmlspecialchars($product['image']); ?>">
                 Add to Bag
+            </button>
+
+            <button class="add-to-wishlist"
+                data-id="<?php echo htmlspecialchars($product['id']); ?>"
+                data-name="<?php echo htmlspecialchars($product['name']); ?>"
+                data-price="<?php echo htmlspecialchars($product['price']); ?>"
+                data-image="<?php echo htmlspecialchars($product['image']); ?>">
+                Add to Wishlist
             </button>
         </div>
     </div>
@@ -148,7 +157,6 @@ if (isset($_GET['id'])) {
                 $(this).addClass("active");
             });
 
-
             // Add to cart
             $(".add-to-cart").click(function() {
                 var productId = $(this).data("id");
@@ -170,6 +178,49 @@ if (isset($_GET['id'])) {
 
                 $.ajax({
                     url: "add_to_cart.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        product_id: productId,
+                        category: selectedCategory,
+                        size: selectedSize
+                    },
+                    success: function(response) {
+                        console.log("AJAX Success Response:", response);
+                        if (response.status === "success") {
+                            alert(response.message);
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("Something went wrong. Please try again.");
+                    }
+                });
+            });
+
+            // Add to wishlist
+            $(".add-to-wishlist").click(function() {
+                var productId = $(this).data("id");
+                var productName = $(this).data("name");
+                var productPrice = $(this).data("price");
+                var productImage = $(this).data("image");
+
+                var selectedCategory = $(".category-button.active").data("category");
+                var selectedSize = $(".size-button.active").data("size");
+
+                console.log("Product ID:", productId);
+                console.log("Category:", selectedCategory);
+                console.log("Size:", selectedSize);
+
+                if (!selectedCategory || !selectedSize) {
+                    alert("Please select a category and a size.");
+                    return;
+                }
+
+                $.ajax({
+                    url: "add_to_wishlist.php",
                     type: "POST",
                     dataType: "json",
                     data: {

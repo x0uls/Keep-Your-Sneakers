@@ -1,40 +1,29 @@
 <?php
 session_start();
-require 'db.php'; // Database connection
+require 'db.php';
+require 'filter.php'; // Our new filter class
 include '_head.php';
 include '_base.php';
 
-if (isset($_GET['query'])) {
-    $search = trim($_GET['query']); // Clean the search input
-    $min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : null;
-    $max_price = isset($_GET['max_price']) ? (float)$_GET['max_price'] : null;
+try {
+    $filter = new ProductFilter($pdo);
 
-    try {
-        $sql = "SELECT * FROM products 
-                WHERE name LIKE :search";
-
-        if ($min_price !== null && $max_price !== null) {
-            $sql .= " AND price BETWEEN :min_price AND :max_price";
-        }
-
-        $stmt = $pdo->prepare($sql);
-        $searchTerm = "%" . $search . "%";
-        $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
-
-        if ($min_price !== null && $max_price !== null) {
-            $stmt->bindParam(':min_price', $min_price);
-            $stmt->bindParam(':max_price', $max_price);
-        }
-
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-        $result = null;
+    if (isset($_GET['query'])) {
+        $filter->applyFilters($_GET);
     }
-} else {
+
+    $result = $filter->getResults();
+    $categories = $filter->getCategories();
+    $sizes = $filter->getSizes();
+    $search = $filter->getSearchTerm();
+    $category_id = $filter->getCurrentCategory();
+    $size_id = $filter->getCurrentSize();
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
     $result = null;
     $search = '';
+    $categories = [];
+    $sizes = [];
 }
 ?>
 
@@ -46,6 +35,7 @@ if (isset($_GET['query'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/filter.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -83,40 +73,10 @@ if (isset($_GET['query'])) {
             color: #333;
         }
 
-        .filter-form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .filter-form input[type="number"],
-        .filter-form button {
-            width: 180px;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-        }
-
-        .filter-form button {
-            background-color: #111;
-            color: white;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .filter-form button:hover {
-            background-color: #333;
-        }
-
         .product {
             display: inline-block;
-            width: calc(33.333% - 40px);
+            width: calc(33% - 40px);
+            /* Adjust to 1/3 width */
             margin: 20px;
             background-color: white;
             border-radius: 12px;
@@ -127,6 +87,7 @@ if (isset($_GET['query'])) {
             text-decoration: none;
             color: inherit;
         }
+
 
         .product:hover {
             transform: translateY(-10px);
@@ -204,27 +165,17 @@ if (isset($_GET['query'])) {
             text-align: center;
         }
 
-
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                /* Full width for smaller screens */
-                margin-bottom: 20px;
-            }
-
-            .search-results-container {
-                width: 100%;
-                /* Full width for smaller screens */
-            }
-
             .product {
-                width: calc(50% - 40px);
+                width: calc(33.333% - 40px);
+                /* 3 items per row on tablets */
             }
         }
 
         @media (max-width: 480px) {
             .product {
-                width: 100%;
+                width: calc(100% - 20px);
+                /* 1 item per row on mobile */
                 margin: 10px 0;
             }
 
@@ -236,55 +187,91 @@ if (isset($_GET['query'])) {
 </head>
 
 <body>
-
     <div class="container">
-        <!-- Sidebar on the left for price filter -->
+        <!-- Sidebar Filter -->
         <div class="sidebar">
             <h3>Filter by Price</h3>
             <div class="filter-form">
-                <form method="GET" action="search.php">
-                    <input type="hidden" name="query" value="<?php echo htmlspecialchars($search); ?>">
+                <form method="GET" action="search.php" id="filterForm">
+                    <input type="hidden" name="query" value="<?= htmlspecialchars($search) ?>">
 
                     <div class="price-input">
                         <span>RM</span>
-                        <input type="number" name="min_price" placeholder="Min Price"
-                            <?php if (isset($_GET['min_price'])) echo 'value="' . $_GET['min_price'] . '"'; ?> required>
+                        <input type="number" name="min_price" placeholder="Min Price" id="minPrice"
+                            value="<?= $filter->getMinPrice() !== null ? $filter->getMinPrice() : '' ?>">
                     </div>
 
                     <div class="price-input">
                         <span>RM</span>
-                        <input type="number" name="max_price" placeholder="Max Price"
-                            <?php if (isset($_GET['max_price'])) echo 'value="' . $_GET['max_price'] . '"'; ?> required>
+                        <input type="number" name="max_price" placeholder="Max Price" id="maxPrice"
+                            value="<?= $filter->getMaxPrice() !== null ? $filter->getMaxPrice() : '' ?>">
                     </div>
 
-                    <button type="submit">Apply Filter</button>
+                    <div>
+                        <select name="category" id="categorySelect">
+                            <option value="">Select Category</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category['id'] ?>" <?= $category_id == $category['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($category['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select name="size" id="sizeSelect" <?= empty($sizes) ? 'disabled' : '' ?>>
+                            <option value="">Select Size</option>
+                            <?php foreach ($sizes as $size): ?>
+                                <option value="<?= $size['id'] ?>" <?= $size_id == $size['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($size['size_label']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <button type="button" onclick="submitFilterForm()">Apply Filter</button>
                 </form>
             </div>
         </div>
 
-        <!-- Product Results in the center -->
+        <!-- Results Section -->
         <div class="search-results-container">
             <h2>Search Results</h2>
 
-            <!-- Products will be displayed here -->
-            <?php
-            if ($result && count($result) > 0) {
-                foreach ($result as $row) {
-                    echo '<a href="product_page.php?id=' . $row['id'] . '" class="product">';
-                    $image_path = '/products/' . $row['image']; // Assuming the image is stored in /products
-                    echo '<img src="' . $image_path . '" alt="' . htmlspecialchars($row['name']) . '">';
-                    echo '<h3>' . htmlspecialchars($row['name']) . '</h3>';
-                    echo '<p>RM ' . number_format($row['price'], 2) . '</p>';
-                    echo '<span class="product-button">View Product</span>';
-                    echo '</a>';
-                }
-            } else {
-                if (isset($_GET['query'])) { // ✅ Only show "no results" if search/filter was attempted
-                    echo "<p class='no-results'>No products found for '" . htmlspecialchars($search) . "'</p>";
-                }
-            }
-            ?>
+            <?php if ($result && count($result) > 0): ?>
+                <?php foreach ($result as $row): ?>
+                    <a href="product_page.php?id=<?= $row['id'] ?>" class="product">
+                        <img src="/products/<?= htmlspecialchars($row['image']) ?>" alt="<?= htmlspecialchars($row['name']) ?>">
+                        <h3><?= htmlspecialchars($row['name']) ?></h3>
+                        <p>RM <?= number_format($row['price'], 2) ?></p>
+                        <span class="product-button">View Product</span>
+                    </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="no-results">No products found.</p>
+            <?php endif; ?>
         </div>
+
+        <!-- JavaScript remains the same -->
+        <script>
+            function submitFilterForm() {
+                const form = document.getElementById('filterForm');
+                const formData = new FormData(form);
+                const params = new URLSearchParams();
+
+                for (const [key, value] of formData.entries()) {
+                    if (value !== '' && value !== null) {
+                        params.append(key, value);
+                    }
+                }
+
+                window.location.href = 'search.php?' + params.toString();
+            }
+
+            document.getElementById('categorySelect').addEventListener('change', function() {
+                submitFilterForm();
+            });
+        </script>
     </div>
 </body>
 

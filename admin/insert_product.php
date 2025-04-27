@@ -11,7 +11,7 @@ include '../db.php'; // Make sure your db.php connects to your database properly
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
-    $desc = $_POST['description'];
+    $desc = $_POST['description'];  // This will accept HTML content
     $price = $_POST['price'];
     $categories = $_POST['categories'] ?? [];
     $sizes = $_POST['sizes'] ?? [];

@@ -62,6 +62,23 @@ body {
     background-color: #333;
 }
 
+.add-to-wishlist {
+    background-color: #fff;
+    color: #111; /* Black text to match the contrast */
+    border: 2px solid #111; /* Border to match the text color */
+    padding: 15px 30px;
+    margin-top: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.add-to-wishlist:hover {
+    background-color: #f0f0f0; /* Slight gray background on hover */
+    color: #111; /* Keep text color black when hovered */
+}
+
 .category-buttons,
 .size-selection {
     margin-bottom: 20px;

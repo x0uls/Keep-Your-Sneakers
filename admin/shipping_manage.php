@@ -176,53 +176,6 @@ if (isset($_GET['message'])) {
             color: darkred;
             text-decoration: underline;
         }
-
-        .floating-return {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            background: #111;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease;
-        }
-
-        .floating-return:hover {
-            background: #333;
-        }
-
-        /* Message styles */
-        .message {
-            padding: 15px;
-            margin: 20px auto;
-            max-width: 80%;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .success {
-            background-color: #dff0d8;
-            color: #3c763d;
-            border: 1px solid #d6e9c6;
-        }
-
-        .error {
-            background-color: #f2dede;
-            color: #a94442;
-            border: 1px solid #ebccd1;
-        }
-
-        .info {
-            background-color: #d9edf7;
-            color: #31708f;
-            border: 1px solid #bce8f1;
-        }
     </style>
 </head>
 

@@ -54,8 +54,8 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="../css/admin.css">
 
-
     <style>
+        /* Styles for the page */
         body {
             font-family: 'Poppins', sans-serif;
             padding: 40px;
@@ -142,7 +142,6 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
             bottom: 30px;
             left: 30px;
             background: #111;
-            /* Green color, similar to a 'back' button */
             color: white;
             padding: 15px 30px;
             border-radius: 25px;
@@ -155,7 +154,6 @@ $allSizes = $pdo->query("SELECT * FROM sizes ORDER BY size_label")->fetchAll(PDO
 
         .floating-return:hover {
             background: #333;
-            /* Darker green when hovered */
         }
     </style>
 </head>

@@ -14,7 +14,7 @@ if (!isset($_POST['product_id'])) {
 
 $product_id = intval($_POST['product_id']);
 $name = htmlspecialchars($_POST['name']);
-$description = htmlspecialchars($_POST['description']);
+$description = $_POST['description'];  // Keep raw HTML for description
 $price = $_POST['price'];
 $category_id = $_POST['category_id'];
 $sizes = $_POST['sizes'] ?? [];

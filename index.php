@@ -18,7 +18,6 @@ try {
 <body>
 
     <div class="content">
-        <h1>Welcome to the Home Page</h1>
 
         <!-- Top 5 Bestsellers Section -->
         <div class="bestsellers-section">
@@ -33,7 +32,8 @@ try {
                                 <p>RM <?php echo number_format($product['price'], 2); ?></p>
                             </a>
 
-                            <a href="javascript:void(0);" class="wishlist-button" onclick="addToWishlist(<?php echo $product['id']; ?>)">❤️ Add to Wishlist</a>
+                            <a href="javascript:void(0);" class="wishlist-button" onclick="addToWishlist(<?php echo $product['id']; ?>)">
+                                <img src="/images/wishlist-white.png" alt="Add to Wishlist" style="width:20px; height:20px; vertical-align:middle;"> Add to Wishlist</a>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -92,13 +92,14 @@ try {
         padding: 20px;
         background-color: #fff;
         border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     .bestsellers-section h2 {
         text-align: center;
         font-size: 32px;
         margin-bottom: 20px;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .bestsellers-container {
@@ -112,14 +113,14 @@ try {
         margin-bottom: 20px;
         background-color: white;
         border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         text-align: center;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .bestseller-item:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05, 1.05);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     }
 
     .bestseller-item img {
@@ -134,33 +135,35 @@ try {
         font-size: 18px;
         margin: 10px 0;
         color: #333;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .bestseller-item p {
         font-size: 16px;
         color: #666;
         margin-bottom: 10px;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .bestseller-item a {
         text-decoration: none;
-        color: inherit;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
     }
 
     .wishlist-button {
         display: inline-block;
-        margin-top: 10px;
+        margin-bottom: 10px;
         padding: 8px 12px;
-        background-color: #FF5A5F;
-        color: white;
+        background-color: black;
         border-radius: 8px;
-        text-decoration: none;
         font-size: 14px;
         transition: background-color 0.3s;
     }
 
     .wishlist-button:hover {
-        background-color: #e0484d;
+        background-color: gray;
+        transition: 0.3s;
     }
 
     /* Wishlist popup style */

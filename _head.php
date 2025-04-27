@@ -49,9 +49,9 @@ if (isset($_SESSION['user_id'])) {
 
         <!-- Navigation Menu -->
         <nav>
-            <a href="/page/men.php" class="nav-btn">Men</a>
-            <a href="/page/women.php" class="nav-btn">Women</a>
-            <a href="/page/kids.php" class="nav-btn">Kids</a>
+            <a href="/search.php?query=&category=1" class="nav-btn">Men</a>
+            <a href="/search.php?query=&category=2" class="nav-btn">Women</a>
+            <a href="/search.php?query=&category=3" class="nav-btn">Kids</a>
         </nav>
 
         <!-- Right-side container -->
@@ -85,8 +85,8 @@ if (isset($_SESSION['user_id'])) {
             </form>
 
             <!-- Wishlist Button -->
-            <a href="/wishlist.php" class="header-wishlist-button">
-                <img src="/images/wishlist.png" alt="Wishlist" />
+            <a href="/wishlist.php">
+                <img src="/images/wishlist-black.png" alt="Wishlist" class="header-wishlist-button" />
             </a>
 
             <!-- Cart Button -->

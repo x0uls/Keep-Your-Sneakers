@@ -1,153 +1,269 @@
 <?php
 session_start();
-require 'db.php'; // This sets up $pdo
+require 'db.php';
+include '_head.php'; // This includes the header, assuming it has a link to CSS/JS
 
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit();
+// Fetch all wishlist items for the logged-in user
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT p.id AS product_id, p.name, p.price, p.image, s.size_label, c.name AS category_name 
+            FROM wishlist w
+            JOIN products p ON w.product_id = p.id
+            JOIN sizes s ON w.size_id = s.id
+            JOIN product_categories pc ON p.id = pc.product_id
+            JOIN categories c ON pc.category_id = c.id
+            WHERE w.user_id = :user_id
+        ");
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $wishlist_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($wishlist_items)) {
+            echo '<div class="wishlist-container">';
+            echo '<h2>Your Wishlist</h2>';
+            echo '<div class="wishlist-items">';
+            foreach ($wishlist_items as $item) {
+                echo '<div class="wishlist-item">';
+                echo '<div class="wishlist-item-image">';
+                echo '<img src="/products/' . htmlspecialchars($item['image']) . '" alt="' . htmlspecialchars($item['name']) . '">';
+                echo '</div>';
+                echo '<div class="wishlist-item-info">';
+                echo '<h3>' . htmlspecialchars($item['name']) . '</h3>';
+                echo '<p>Size: ' . htmlspecialchars($item['size_label']) . '</p>';
+                echo '<p>Category: ' . htmlspecialchars($item['category_name']) . '</p>';
+                echo '<p>Price: RM' . htmlspecialchars($item['price']) . '</p>';
+                echo '<div class="wishlist-item-buttons">';
+                echo '<button class="remove-from-wishlist" data-product-id="' . htmlspecialchars($item['product_id']) . '" data-size="' . htmlspecialchars($item['size_label']) . '">Remove</button>';
+                echo '<button class="add-to-cart" data-product-id="' . htmlspecialchars($item['product_id']) . '" data-size="' . htmlspecialchars($item['size_label']) . '" data-category="' . htmlspecialchars($item['category_name']) . '">Add to Cart</button>';
+                echo '</div>';
+                echo '</div>';
+                echo '</div>';
+            }
+            echo '</div>';
+            echo '</div>';
+        } else {
+            echo '<div class="wishlist-container"><p>Your wishlist is empty.</p></div>';
+        }
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
+} else {
+    echo '<div class="wishlist-container"><p>Please log in to view your wishlist.</p></div>';
 }
-
-$user_id = $_SESSION['user_id'];
-
-// Fetch products in the user's wishlist
-$stmt = $pdo->prepare("
-    SELECT products.*
-    FROM wishlist
-    INNER JOIN products ON wishlist.product_id = products.id
-    WHERE wishlist.user_id = ?
-");
-$stmt->execute([$user_id]);
-$wishlistProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<?php include '_head.php'; ?>
+<script>
+    // Wait for the document to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners to all "Add to Cart" buttons
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
 
-<body>
-    <div class="content">
-        <h1>My Wishlist</h1>
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
 
-        <?php if (!empty($wishlistProducts)): ?>
-            <div class="wishlist-container">
-                <?php foreach ($wishlistProducts as $product): ?>
-                    <div class="wishlist-item">
-                        <a href="product_page.php?id=<?php echo $product['id']; ?>">
-                            <img src="/products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
-                            <h3><?php echo htmlspecialchars($product['name']); ?></h3>
-                            <p>RM <?php echo number_format($product['price'], 2); ?></p>
-                        </a>
-                        <a href="remove_from_wishlist.php?product_id=<?php echo $product['id']; ?>" class="remove-button">🗑 Remove</a>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-wishlist">
-                <p>🛒 Your wishlist is empty.<br>Start adding your favorite items!</p>
-                <a href="index.php" class="shop-now-button">🛍️ Shop Now</a>
-            </div>
-        <?php endif; ?>
-    </div>
+                const productId = button.dataset.productId;
+                const size = button.dataset.size;
+                const category = button.dataset.category;
 
-    <?php include '_foot.php'; ?>
-</body>
+                // Send the data using Fetch API
+                fetch('add_to_cart.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            'product_id': productId,
+                            'size': size,
+                            'category': category
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Handle the response (success or error)
+                        if (data.status === 'success') {
+                            alert('Item added to cart!');
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    });
+            });
+        });
+    });
 
+    // Add event listeners to all "Remove from Wishlist" buttons
+    // Add event listeners to all "Remove from Wishlist" buttons
+    const removeFromWishlistButtons = document.querySelectorAll('.remove-from-wishlist');
+
+    removeFromWishlistButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const productId = button.dataset.productId;
+            const size = button.dataset.size;
+
+            // Send the data using Fetch API
+            fetch('remove_wishlist.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        'product_id': productId,
+                        'size': size
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response (success or error)
+                    if (data.status === 'success') {
+                        alert('Item removed from wishlist!');
+                        button.closest('.wishlist-item').remove(); // Remove the item from the DOM
+                        // Reload the page to refresh the wishlist
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        });
+    });
+</script>
+
+<!-- Add your CSS below -->
 <style>
+    /* General Styles */
     body {
-        background-color: #f9f9f9;
+        font-family: 'Helvetica Neue', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
     }
 
-    .content {
-        padding: 40px;
+    /* Wishlist Container */
+    .wishlist-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
     }
 
-    h1 {
+    h2 {
         text-align: center;
-        font-size: 36px;
-        margin-bottom: 40px;
+        font-size: 28px;
+        margin-bottom: 20px;
         color: #333;
     }
 
-    .wishlist-container {
+    /* Wishlist Item List (Now Grid) */
+    .wishlist-items {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        /* Create flexible columns */
         gap: 20px;
-        margin-top: 20px;
+        /* Add spacing between items */
     }
 
+    /* Wishlist Item */
     .wishlist-item {
+        display: flex;
+        flex-direction: column;
+        /* Stack items vertically */
         background-color: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        text-align: center;
-        padding: 20px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease-in-out;
     }
 
     .wishlist-item:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .wishlist-item img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 12px;
+    /* Wishlist Item Image */
+    .wishlist-item-image {
         margin-bottom: 15px;
     }
 
-    .wishlist-item h3 {
+    .wishlist-item-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    /* Wishlist Item Info */
+    .wishlist-item-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .wishlist-item-info h3 {
         font-size: 20px;
+        margin: 0;
         color: #333;
-        margin: 10px 0;
     }
 
-    .wishlist-item p {
-        color: #666;
-        margin-bottom: 12px;
-    }
-
-    .remove-button {
-        display: inline-block;
-        background-color: #ff4d4d;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 14px;
-        text-decoration: none;
-        transition: background-color 0.3s ease;
-    }
-
-    .remove-button:hover {
-        background-color: #e60000;
-    }
-
-    /* Empty Wishlist Styling */
-    .empty-wishlist {
-        text-align: center;
-        margin-top: 100px;
-        font-size: 24px;
-        color: #999;
-    }
-
-    .empty-wishlist p {
-        margin-bottom: 20px;
-    }
-
-    .shop-now-button {
-        display: inline-block;
-        background-color: black;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
+    .wishlist-item-info p {
         font-size: 16px;
-        transition: background-color 0.3s ease;
+        color: #777;
     }
 
-    .shop-now-button:hover {
-        background-color: #333;
+    /* Wishlist Item Buttons */
+    .wishlist-item-buttons {
+        display: flex;
+        justify-content: space-between;
+        /* Space out buttons */
+        gap: 10px;
+        /* Space between buttons */
+    }
+
+    .wishlist-item-buttons button {
+        flex: 1;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .remove-from-wishlist {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .add-to-cart {
+        background-color: #4caf50;
+        color: white;
+    }
+
+    .remove-from-wishlist:hover {
+        background-color: #d32f2f;
+    }
+
+    .add-to-cart:hover {
+        background-color: #388e3c;
+    }
+
+    /* Empty Wishlist Message */
+    .wishlist-container p {
+        text-align: center;
+        font-size: 18px;
+        color: #666;
     }
 </style>
-
-</html>
