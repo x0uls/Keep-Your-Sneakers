@@ -10,19 +10,18 @@ $total_items = count($cart_items);
 // Fetch user profile picture if logged in
 $profile_picture_path = '/profilepic/default-profile-icon.png'; // Default fallback\
 if (isset($_SESSION['user_id'])) {
-    include __DIR__ . '/db.php';
-
+    include __DIR__ . '/db.php'; // Absolute path for safety
     try {
         $stmt = $pdo->prepare("SELECT profile_picture FROM users WHERE id = :user_id");
         $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
         $profile_picture = $stmt->fetchColumn();
 
-        if ($profile_picture && file_exists($_SERVER['DOCUMENT_ROOT'] . '/profilepic/' . $profile_picture)) {
-            $profile_picture_path = '/profilepic/' . $profile_picture;
+        if ($profile_picture && file_exists(__DIR__ . '/../uploads/' . $profile_picture)) {
+            $profile_picture_path = $_SERVER['DOCUMENT_ROOT'] . '/profilepic/' . $profile_picture;
         }
     } catch (PDOException $e) {
-        // Silently fail and use default
+        // Just fallback to default
     }
 }
 ?>
@@ -66,12 +65,12 @@ if (isset($_SESSION['user_id'])) {
                             <img src="<?= $profile_picture_path ?>" alt="Profile" class="profile-icon" />
                         </a>
                         <div class="dropdown-content">
-                            <a href="/user/dashboard.php">Profile</a>
-                            <a href="logout.php" onclick="setTimeout(() => { location.reload(); }, 500);">Logout</a>
+                            <a href="/dashboard.php">Profile</a>
+                            <a href="/logout.php" onclick="setTimeout(() => { location.reload(); }, 500);">Logout</a>
                         </div>
                     </div>
                 <?php else: ?>
-                    <a href="/login.php" class="signin-btn">Sign In</a>
+                    <a href="login.php" class="signin-btn">Sign In</a>
                 <?php endif; ?>
             </div>
 
@@ -85,10 +84,16 @@ if (isset($_SESSION['user_id'])) {
                 </button>
             </form>
 
+            <!-- Wishlist Button -->
+            <a href="/wishlist.php" class="header-wishlist-button">
+                <img src="/images/wishlist.png" alt="Wishlist" />
+            </a>
+
             <!-- Cart Button -->
             <a href="/cart.php">
                 <img src="/images/cart.png" alt="Cart" class="cart-button" />
             </a>
+
         </div>
     </header>
 

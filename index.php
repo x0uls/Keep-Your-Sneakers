@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'db.php'; // Database connection
-include '_head.php';  // Include head only once
+include '_head.php'; // Include head only once
 
 // Fetch top 5 best-selling products
 try {
@@ -18,6 +18,8 @@ try {
 <body>
 
     <div class="content">
+        <h1>Welcome to the Home Page</h1>
+
         <!-- Top 5 Bestsellers Section -->
         <div class="bestsellers-section">
             <h2>Top 5 Bestsellers</h2>
@@ -30,6 +32,8 @@ try {
                                 <h3><?php echo htmlspecialchars($product['name']); ?></h3>
                                 <p>RM <?php echo number_format($product['price'], 2); ?></p>
                             </a>
+
+                            <a href="javascript:void(0);" class="wishlist-button" onclick="addToWishlist(<?php echo $product['id']; ?>)">❤️ Add to Wishlist</a>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -49,10 +53,35 @@ try {
                 $(".success-popup").slideDown().delay(5000).slideUp();
             });
         </script>
-        <?php
-        unset($_SESSION['signup_success']); // Clear message after displaying 
-        ?>
+        <?php unset($_SESSION['signup_success']); ?>
     <?php endif; ?>
+
+    <!-- Add to Wishlist Script -->
+    <script>
+        function addToWishlist(productId) {
+            $.ajax({
+                url: 'add_to_wishlist.php',
+                method: 'POST',
+                data: {
+                    product_id: productId
+                },
+                success: function(response) {
+                    showPopup('✅ Added to Wishlist!');
+                }
+            });
+        }
+
+        function showPopup(message) {
+            const popup = document.createElement('div');
+            popup.className = 'wishlist-popup';
+            popup.innerText = message;
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                popup.remove();
+            }, 3000); // Remove from DOM after fully faded out
+        }
+    </script>
 
 </body>
 
@@ -116,6 +145,59 @@ try {
     .bestseller-item a {
         text-decoration: none;
         color: inherit;
+    }
+
+    .wishlist-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 12px;
+        background-color: #FF5A5F;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .wishlist-button:hover {
+        background-color: #e0484d;
+    }
+
+    /* Wishlist popup style */
+    .wishlist-popup {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #000;
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(59, 49, 49, 0.3);
+        z-index: 9999;
+        font-size: 16px;
+        opacity: 1;
+        animation: fadeInOut 3s forwards;
+    }
+
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        10% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        90% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
     }
 
     @media (max-width: 768px) {

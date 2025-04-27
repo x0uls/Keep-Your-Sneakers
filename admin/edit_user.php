@@ -75,6 +75,8 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <title>Edit User</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/admin.css">
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;

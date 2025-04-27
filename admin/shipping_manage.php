@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['admin']) || $_SESSION['adm
     exit();
 }
 
-include 'db.php'; // Database connection
+include '../db.php'; // Database connection
 
 // Success and error messages
 $message = '';
@@ -84,6 +84,8 @@ if (isset($_GET['message'])) {
     <meta charset="UTF-8">
     <title>Shipping Management</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/admin.css">
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;

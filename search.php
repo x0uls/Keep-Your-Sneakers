@@ -2,6 +2,7 @@
 session_start();
 require 'db.php'; // Database connection
 include '_head.php';
+include '_base.php';
 
 if (isset($_GET['query'])) {
     $search = trim($_GET['query']); // Clean the search input
@@ -285,7 +286,6 @@ if (isset($_GET['query'])) {
             ?>
         </div>
     </div>
-
 </body>
 
 </html>
