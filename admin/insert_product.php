@@ -152,6 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <input type="submit" value="Add Product" />
         </form>
+
+        <a href="product_manage.php" class="floating-return">← Back to Product Manage</a>
     </div>
 
     <script>
