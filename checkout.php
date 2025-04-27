@@ -79,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .checkout-container {
             width: 90%;
-            margin: 0 auto;
+            margin: auto;
+            margin-top: 30px;
             padding: 40px;
             background-color: #fff;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
