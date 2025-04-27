@@ -21,7 +21,7 @@ try {
 
         <!-- Ad Space Section -->
         <div class="ad-space">
-            <img src=/products/AJ4.jpg alt="Advertisement" style="width: 100%; height: 400px;">
+            <img src=/images/LEBRON.png alt="Advertisement" style="width: 100%; height: 100%;">
         </div>
 
         <!-- Top 5 Bestsellers Section -->
@@ -37,8 +37,6 @@ try {
                                 <p>RM <?php echo number_format($product['price'], 2); ?></p>
                             </a>
 
-                            <a href="javascript:void(0);" class="wishlist-button" onclick="addToWishlist(<?php echo $product['id']; ?>)">
-                                <img src="/images/wishlist-white.png" alt="Add to Wishlist" style="width:20px; height:20px; vertical-align:middle;"> Add to Wishlist</a>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -50,12 +48,6 @@ try {
     </div>
 
     <?php include '_foot.php'; ?>
-
-    <!-- Your existing code for success popup and wishlist functionality -->
-
-    <script>
-        // Your existing JavaScript for the wishlist functionality
-    </script>
 
 </body>
 
@@ -69,21 +61,23 @@ try {
 
     /* Ad Space Styles */
     .ad-space {
-        width: 100%;
-        margin-bottom: 20px;
+        margin-top: 20px;
+        width: fit-content;
+        height: fit-content;
         text-align: center;
     }
 
     .ad-space img {
         width: 100%;
-        /* Ensure the ad image takes up full width */
-        height: auto;
+        height: 100%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     /* Bestsellers Section Styles */
     .bestsellers-section {
         margin-top: 20px;
-        /* Reduced margin to fit better with ad space */
+        margin-bottom: 20px;
+        height: 400px;
         padding: 20px;
         background-color: #fff;
         border-radius: 8px;
@@ -93,7 +87,7 @@ try {
     .bestsellers-section h2 {
         text-align: center;
         font-size: 32px;
-        margin-bottom: 20px;
+        margin-bottom: 50spx;
         font-family: 'Montserrat', sans-serif;
     }
 
@@ -144,37 +138,6 @@ try {
         text-decoration: none;
         color: white;
         font-family: 'Montserrat', sans-serif;
-    }
-
-    .wishlist-button {
-        display: inline-block;
-        margin-bottom: 10px;
-        padding: 8px 12px;
-        background-color: black;
-        border-radius: 8px;
-        font-size: 14px;
-        transition: background-color 0.3s;
-    }
-
-    .wishlist-button:hover {
-        background-color: gray;
-        transition: 0.3s;
-    }
-
-    /* Wishlist popup style */
-    .wishlist-popup {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #000;
-        color: #fff;
-        padding: 12px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(59, 49, 49, 0.3);
-        z-index: 9999;
-        font-size: 16px;
-        opacity: 1;
-        animation: fadeInOut 3s forwards;
     }
 
     @keyframes fadeInOut {

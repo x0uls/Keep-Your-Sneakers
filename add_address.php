@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .add-address-btn:hover {
-            background-color: #333;
+            background-color: gray;
         }
 
         /* Footer */

@@ -138,7 +138,7 @@ if (isset($_GET['message'])) {
         }
 
         .button-container a:hover {
-            background-color: #333;
+            background-color: gray;
         }
 
         .shipping-status-dropdown {

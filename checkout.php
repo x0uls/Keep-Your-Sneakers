@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .checkout-btn:hover {
-            background-color: #333;
+            background-color: gray;
         }
 
         @media (max-width: 768px) {
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p>No address found.</p>
                 <?php else: ?>
                     <?php foreach ($addresses as $index => $address): ?>
-                        <div style="border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                 <label style="display: flex; align-items: flex-start; gap: 10px; flex: 1;">
                                     <input type="radio" name="address_id" value="<?php echo $address['id']; ?>" <?php if ($index === 0) echo 'checked'; ?> onclick="updateAddressId(<?php echo $address['id']; ?>)">
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="add_address.php" class="checkout-btn" style="margin-top: 10px; margin-bottom: 30px;">+ Add Address</a>
 
                 <h2>Payment Method</h2>
-                <div style="margin-bottom: 20px;">
+                <div style="border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
                     <input type="radio" name="payment_method" value="cod" checked onclick="setPaymentMethod('cod')"> Cash on Delivery<br>
                     <input type="radio" name="payment_method" value="online" onclick="setPaymentMethod('online')"> Online Banking<br>
                     <input type="radio" name="payment_method" value="card" onclick="setPaymentMethod('card')"> Credit/Debit Card
@@ -157,14 +157,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="hidden" name="address_id" id="address_id" value="<?php echo !empty($addresses) ? $addresses[0]['id'] : ''; ?>">
 
                 <?php if (!empty($addresses)): ?>
-                    <button type="submit" class="checkout-btn">Confirm Order</button>
+                    <a type="submit" class="checkout-btn">Confirm Order</a>
                 <?php endif; ?>
             </form>
         </div>
 
         <!-- RIGHT: Order Summary -->
         <div style="flex: 1; min-width: 280px;">
-            <div style="position: sticky; top: 20px; background: #fafafa; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto;">
+            <div style="position: sticky; top: 20px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto;">
                 <h2>Order Summary</h2>
                 <?php foreach ($cart_items as $item): ?>
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 10px;">

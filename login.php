@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         padding: 40px;
         background: #fff;
         border-radius: 20px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         font-family: 'Poppins', sans-serif;
     }
 
@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     .login-container input[type="text"],
     .login-container input[type="password"] {
-        width: 100%;
+        width: 374px;
         padding: 12px;
         border-radius: 12px;
         border: 1px solid #ccc;
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     .login-container input[type="submit"]:hover {
-        background: #333;
+        background: gray;
     }
 
     .login-container p {

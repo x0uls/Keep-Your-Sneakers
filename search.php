@@ -47,7 +47,6 @@ try {
         .container {
             display: flex;
             padding: 40px;
-            margin-top: 100px;
             align-items: flex-start;
             /* Ensure proper alignment */
         }
@@ -140,7 +139,7 @@ try {
             text-decoration: none;
             border-radius: 50px;
             transition: background-color 0.3s ease;
-            margin-top: 20px;
+            margin-bottom: 10px;
         }
 
         .product-button:hover {

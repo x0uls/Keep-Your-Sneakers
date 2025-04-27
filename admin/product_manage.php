@@ -122,7 +122,7 @@ if (isset($_GET['message'])) {
         }
 
         .button-container a:hover {
-            background-color: #333;
+            background-color: gray;
         }
 
         .delete-button {
@@ -157,7 +157,7 @@ if (isset($_GET['message'])) {
         }
 
         .floating-return:hover {
-            background: #333;
+            background: gray;
         }
 
         /* Message styles */

@@ -51,7 +51,7 @@ btn:hover::after {
 footer {
     text-align: center;
     padding: 10px;
-    background-color: #f1f1f1;
+    background-color: #f0f0f0;
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -226,12 +226,9 @@ nav {
     border-radius: 50%;
     object-fit: cover;
     transition: 0.3s ease-in-out;
-    position: relative;
-    /* Keep position relative */
-    margin-left: 10px;
-    /* Adjust for spacing */
+    position: absolute;
     top: -5px;
-    /* Adjust this value to move it up */
+    right: 10px;
 }
 
 .profile-icon:hover {
@@ -265,7 +262,7 @@ nav {
 
 /*Search Bar*/
 .search-form {
-    position: fixed;
+    position: absolute;
     top: 11px;
     right: 300px;
     align-items: center;
@@ -306,7 +303,7 @@ nav {
 .cart-button {
     width: 30px;
     height: 30px;
-    position: fixed;
+    position: absolute;
     top: 18px;
     right: 200px;
 }
@@ -314,7 +311,7 @@ nav {
 .header-wishlist-button {
     width: 30px;
     height: 30px;
-    position: fixed;
+    position: absolute;
     top: 18px;
     right: 250px;
 }

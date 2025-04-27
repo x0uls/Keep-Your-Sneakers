@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .signup-container input[type="text"],
     .signup-container input[type="email"],
     .signup-container input[type="password"] {
-        width: 100%;
+        width: 374px;
         padding: 12px;
         border-radius: 12px;
         border: 1px solid #ccc;
@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     .signup-container button:hover {
-        background: #333;
+        background: gray;
     }
 
     .signup-container .error {
