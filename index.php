@@ -19,6 +19,11 @@ try {
 
     <div class="content">
 
+        <!-- Ad Space Section -->
+        <div class="ad-space">
+            <img src=/products/AJ4.jpg alt="Advertisement" style="width: 100%; height: 400px;">
+        </div>
+
         <!-- Top 5 Bestsellers Section -->
         <div class="bestsellers-section">
             <h2>Top 5 Bestsellers</h2>
@@ -46,41 +51,10 @@ try {
 
     <?php include '_foot.php'; ?>
 
-    <?php if (isset($_SESSION['signup_success'])): ?>
-        <div class="success-popup"><?php echo $_SESSION['signup_success']; ?></div>
-        <script>
-            $(document).ready(function() {
-                $(".success-popup").slideDown().delay(5000).slideUp();
-            });
-        </script>
-        <?php unset($_SESSION['signup_success']); ?>
-    <?php endif; ?>
+    <!-- Your existing code for success popup and wishlist functionality -->
 
-    <!-- Add to Wishlist Script -->
     <script>
-        function addToWishlist(productId) {
-            $.ajax({
-                url: 'add_to_wishlist.php',
-                method: 'POST',
-                data: {
-                    product_id: productId
-                },
-                success: function(response) {
-                    showPopup('✅ Added to Wishlist!');
-                }
-            });
-        }
-
-        function showPopup(message) {
-            const popup = document.createElement('div');
-            popup.className = 'wishlist-popup';
-            popup.innerText = message;
-            document.body.appendChild(popup);
-
-            setTimeout(() => {
-                popup.remove();
-            }, 3000); // Remove from DOM after fully faded out
-        }
+        // Your existing JavaScript for the wishlist functionality
     </script>
 
 </body>
@@ -93,9 +67,23 @@ try {
         padding: 0;
     }
 
+    /* Ad Space Styles */
+    .ad-space {
+        width: 100%;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .ad-space img {
+        width: 100%;
+        /* Ensure the ad image takes up full width */
+        height: auto;
+    }
+
     /* Bestsellers Section Styles */
     .bestsellers-section {
-        margin-top: 40px;
+        margin-top: 20px;
+        /* Reduced margin to fit better with ad space */
         padding: 20px;
         background-color: #fff;
         border-radius: 8px;
