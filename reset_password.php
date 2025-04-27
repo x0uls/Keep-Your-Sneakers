@@ -35,7 +35,7 @@ include '_head.php';
     }
 
     .reset-container input[type="password"] {
-        width: 100%;
+        width: 374px;
         padding: 12px;
         border-radius: 12px;
         border: 1px solid #ccc;

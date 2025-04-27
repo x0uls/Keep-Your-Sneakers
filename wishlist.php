@@ -36,8 +36,8 @@ if (isset($_SESSION['user_id'])) {
                 echo '<p>Category: ' . htmlspecialchars($item['category_name']) . '</p>';
                 echo '<p>Price: RM' . htmlspecialchars($item['price']) . '</p>';
                 echo '<div class="wishlist-item-buttons">';
-                echo '<button class="remove-from-wishlist" data-product-id="' . htmlspecialchars($item['product_id']) . '" data-size="' . htmlspecialchars($item['size_label']) . '">Remove</button>';
-                echo '<button class="add-to-cart" data-product-id="' . htmlspecialchars($item['product_id']) . '" data-size="' . htmlspecialchars($item['size_label']) . '" data-category="' . htmlspecialchars($item['category_name']) . '">Add to Cart</button>';
+                echo '<button class="remove-from-wishlist" data-product-id="' . htmlspecialchars($item['product_id']) . '" data-size="' . htmlspecialchars($item['size_label']) . '"><img src="/images/cart-white.png" alt="Cart" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;">Remove</button>';
+                echo '<button class="add-to-cart" data-product-id="' . htmlspecialchars($item['product_id']) . '" data-size="' . htmlspecialchars($item['size_label']) . '" data-category="' . htmlspecialchars($item['category_name']) . '"><img src="/images/bin.png" alt="Bin" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;">Add to Cart</button>';
                 echo '</div>';
                 echo '</div>';
                 echo '</div>';
@@ -189,11 +189,6 @@ if (isset($_SESSION['user_id'])) {
         transition: transform 0.2s ease-in-out;
     }
 
-    .wishlist-item:hover {
-        transform: scale(1.05, 1.05);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-    }
-
     /* Wishlist Item Image */
     .wishlist-item-image {
         margin-bottom: 15px;
@@ -216,6 +211,7 @@ if (isset($_SESSION['user_id'])) {
         font-size: 20px;
         margin: 0;
         color: #333;
+        text-align: center;
     }
 
     .wishlist-item-info p {
@@ -234,30 +230,37 @@ if (isset($_SESSION['user_id'])) {
 
     .wishlist-item-buttons button {
         flex: 1;
-        padding: 8px 15px;
+        padding: 8px 5px;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 15px;
+        font-weight: bold;
         transition: background-color 0.3s;
     }
 
+    .wishlist-item:hover {
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+
     .remove-from-wishlist {
-        background-color: #f44336;
+        background-color: black;
         color: white;
     }
 
     .add-to-cart {
-        background-color: #4caf50;
+        background-color: black;
         color: white;
     }
 
     .remove-from-wishlist:hover {
-        background-color: #d32f2f;
+        background-color: gray;
+        transition: 0.3s;
     }
 
     .add-to-cart:hover {
-        background-color: #388e3c;
+        background-color: gray;
+        transition: 0.3s;
     }
 
     /* Empty Wishlist Message */

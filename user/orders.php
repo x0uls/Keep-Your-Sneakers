@@ -42,33 +42,62 @@ $stmt->closeCursor();
 
         /* Sidebar (Button Container) */
         .button-container {
-            background-color: #f8f8f8;
+            background-color: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 200px;
             display: flex;
             flex-direction: column;
-            height: auto;
-            min-height: 100px;
         }
 
         .button-container a {
             display: block;
             padding: 12px;
-            color: #333;
+            color: white;
             text-decoration: none;
             text-align: center;
             font-size: 18px;
             font-weight: 500;
             margin-bottom: 12px;
-            background-color: #fff;
+            background-color: black;
             border-radius: 8px;
             transition: background-color 0.3s;
         }
 
         .button-container a:hover {
-            background-color: #ddd;
+            background-color: gray;
+        }
+
+        /* Main Content */
+        .dashboard-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .dashboard-container h2 {
+            font-weight: 600;
+            font-size: 28px;
+            margin-bottom: 24px;
+            color: #111;
+        }
+
+        .dashboard-container img {
+            border-radius: 50%;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-container label {
+            display: block;
+            text-align: left;
+            margin: 10px 0 5px;
+            font-weight: 500;
+            color: #333;
         }
 
         /* Orders Section */
@@ -153,7 +182,7 @@ $stmt->closeCursor();
         </div>
     </div>
 
-    <?php include '_foot.php'; ?>
+    <?php include '../_foot.php'; ?>
 </body>
 
 </html>

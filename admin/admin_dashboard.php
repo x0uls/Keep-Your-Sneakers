@@ -46,15 +46,15 @@ include '../_head.php';
             background-color: #fff;
             padding: 40px 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
             text-decoration: none;
             color: #111;
         }
 
         .dashboard-card:hover {
-            transform: translateY(-5px);
-            background-color: #f9f9f9;
+            transform: scale(1.05, 1.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
         }
 
         .dashboard-card h3 {

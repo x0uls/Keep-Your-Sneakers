@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     .reset-container input[type="email"] {
-        width: 100%;
+        width: 374px;
         padding: 12px;
         border-radius: 12px;
         border: 1px solid #ccc;

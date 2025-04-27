@@ -136,6 +136,10 @@ if (isset($_SESSION['user_id'])) {
             text-align: center;
         }
 
+        h3 {
+            margin-top: 10px;
+        }
+
         .warning-box {
             background: #fff3cd;
             color: #856404;
@@ -153,7 +157,6 @@ if (isset($_SESSION['user_id'])) {
         #cartItems {
             display: flex;
             flex-direction: column;
-            gap: 20px;
         }
 
         .cart-item {
@@ -161,7 +164,7 @@ if (isset($_SESSION['user_id'])) {
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e0e0e0;
-            padding: 10px 0;
+            padding: 20px 0;
         }
 
         .cart-item-info {
@@ -224,6 +227,7 @@ if (isset($_SESSION['user_id'])) {
             border-radius: 10px;
             font-weight: 600;
             transition: background 0.3s ease;
+            margin-top: 10px;
         }
 
         #checkoutBtn:hover {

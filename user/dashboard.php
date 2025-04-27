@@ -108,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
 
         /* Sidebar (Button Container) */
         .button-container {
-            background-color: #f8f8f8;
+            background-color: white;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -120,19 +120,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
         .button-container a {
             display: block;
             padding: 12px;
-            color: #333;
+            color: white;
             text-decoration: none;
             text-align: center;
             font-size: 18px;
             font-weight: 500;
             margin-bottom: 12px;
-            background-color: #fff;
+            background-color: black;
             border-radius: 8px;
             transition: background-color 0.3s;
         }
 
         .button-container a:hover {
-            background-color: #ddd;
+            background-color: gray;
         }
 
         /* Main Content */
@@ -169,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
         .dashboard-container input[type="text"],
         .dashboard-container input[type="email"],
         .dashboard-container input[type="file"] {
-            width: 100%;
+            width: 774px;
             padding: 12px;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -191,7 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
         }
 
         .dashboard-container button:hover {
-            background-color: #333;
+            background-color: gray;
         }
 
         .dashboard-container .logout-link {
@@ -204,7 +204,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
         }
 
         .dashboard-container .logout-link:hover {
-            color: #b71c1c;
+            color: black;
         }
 
         .dashboard-container .message-success {
@@ -242,6 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
         /* Show button only for admin */
         <?php if ($is_admin): ?>.admin-dashboard-btn {
             display: block;
+            font-family: 'Poppins', sans-serif;
         }
 
         <?php endif; ?>

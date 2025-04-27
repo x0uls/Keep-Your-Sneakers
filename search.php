@@ -47,7 +47,6 @@ try {
         .container {
             display: flex;
             padding: 40px;
-            margin-top: 100px;
             align-items: flex-start;
             /* Ensure proper alignment */
         }
@@ -76,7 +75,7 @@ try {
 
         h2 {
             text-align: center;
-            font-size: 36px;
+            font-size: 30px;
             font-weight: 600;
             margin-bottom: 40px;
             color: #333;
@@ -128,23 +127,6 @@ try {
             font-size: 18px;
             font-weight: 400;
             color: #999;
-        }
-
-        .product-button {
-            display: inline-block;
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            background-color: #111;
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .product-button:hover {
-            background-color: #333;
         }
 
         .price-input {
@@ -246,8 +228,31 @@ try {
 
         <!-- Results Section -->
         <div class="search-results-container">
-            <h2>Search Results</h2>
+            <h2>
+                <?php
+                // Determine the category name based on the selected category ID
+                $category_name = '';
+                if (!empty($category_id)) {
+                    foreach ($categories as $category) {
+                        if ($category['id'] == $category_id) {
+                            $category_name = $category['name'];
+                            break;
+                        }
+                    }
+                }
 
+                // Determine the message based on the presence of query and category
+                if (!empty($search) && !empty($category_id)) {
+                    echo 'Searching for "' . htmlspecialchars($search) . '" in "' . htmlspecialchars($category_name) . '"';
+                } elseif (!empty($search)) {
+                    echo 'Searching for "' . htmlspecialchars($search) . '"';
+                } elseif (!empty($category_name)) {
+                    echo htmlspecialchars($category_name) . "'s" . ' Category';
+                } else {
+                    echo 'Search Results';
+                }
+                ?>
+            </h2>
             <?php if ($result && count($result) > 0): ?>
                 <?php
                 $uniqueProducts = [];
@@ -264,7 +269,6 @@ try {
                         <h3><?= htmlspecialchars($row['name']) ?></h3>
                         <p style="font-size: 14px; color: #777; margin: 5px 0;"><?= htmlspecialchars($row['category_name']) ?></p>
                         <p>RM <?= number_format($row['price'], 2) ?></p>
-                        <span class="product-button">View Product</span>
                     </a>
                 <?php endforeach; ?>
 
