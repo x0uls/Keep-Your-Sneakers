@@ -58,17 +58,32 @@ if (isset($_REQUEST['delete_id'])) {
 }
 
 // Fetch orders with their shipping status and username
+// Fetch orders with optional search
+$search = $_GET['search'] ?? '';
+
 try {
-    $stmt = $pdo->query("SELECT orders.id, orders.order_date, orders.payment_status, orders.shipping_status, 
-                         orders.address, users.username 
-                         FROM orders 
-                         LEFT JOIN users ON orders.user_id = users.id 
-                         ORDER BY orders.id DESC");
+    if (!empty($search)) {
+        $stmt = $pdo->prepare("SELECT orders.id, orders.order_date, orders.payment_status, orders.shipping_status, 
+                                orders.address, users.username 
+                                FROM orders 
+                                LEFT JOIN users ON orders.user_id = users.id 
+                                WHERE orders.id LIKE ? OR users.username LIKE ? OR orders.address LIKE ?
+                                ORDER BY orders.id DESC");
+        $searchTerm = '%' . $search . '%';
+        $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
+    } else {
+        $stmt = $pdo->query("SELECT orders.id, orders.order_date, orders.payment_status, orders.shipping_status, 
+                              orders.address, users.username 
+                              FROM orders 
+                              LEFT JOIN users ON orders.user_id = users.id 
+                              ORDER BY orders.id DESC");
+    }
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $message = "Error fetching orders: " . $e->getMessage();
     $message_type = "error";
 }
+
 
 // Check for message in URL parameters
 if (isset($_GET['message'])) {
@@ -176,6 +191,12 @@ if (isset($_GET['message'])) {
             color: darkred;
             text-decoration: underline;
         }
+
+        .update-button,
+        .delete-button,
+        .button-container a {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
     </style>
 </head>
 
@@ -189,6 +210,19 @@ if (isset($_GET['message'])) {
             <?php echo htmlspecialchars($message); ?>
         </div>
     <?php endif; ?>
+
+    <!-- Search Bar -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <form method="GET" action="shipping_manage.php">
+            <input type="text" name="search" placeholder="Search by Order ID, Username, or Address"
+                value="<?php echo htmlspecialchars($search); ?>"
+                style="padding: 8px; width: 300px; border-radius: 6px; border: 1px solid #ccc;">
+            <button type="submit" style="padding: 8px 16px; background-color: #111; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                Search
+            </button>
+        </form>
+    </div>
+
 
     <!-- Orders Table -->
     <table>

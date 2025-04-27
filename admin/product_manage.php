@@ -12,19 +12,14 @@ include '../db.php'; // Database connection
 $message = '';
 $message_type = '';
 
-// Delete product logic with transaction
+// Handle delete product
 if (isset($_REQUEST['delete_id'])) {
     $product_id = $_REQUEST['delete_id'];
 
     try {
         $pdo->beginTransaction();
 
-        // First delete all related records (order_items, cart_items, etc.)
-        // Add these if you have foreign key relationships
-        // $stmt = $pdo->prepare("DELETE FROM order_items WHERE product_id = ?");
-        // $stmt->execute([$product_id]);
-
-        // Then delete the product
+        // You should also delete from related tables if necessary (e.g., product_sizes, product_categories)
         $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
         $stmt->execute([$product_id]);
 
@@ -37,18 +32,36 @@ if (isset($_REQUEST['delete_id'])) {
         $message_type = "error";
     }
 
-    // Refresh after delete to prevent form resubmission
     header("Location: product_manage.php?message=" . urlencode($message) . "&type=" . $message_type);
     exit();
 }
 
-// Fetch products
+// Handle search
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
 try {
-    $products = $pdo->query("
-        SELECT id, name, price, image
-        FROM products
-        ORDER BY id DESC
-    ")->fetchAll(PDO::FETCH_ASSOC);
+    if (!empty($search)) {
+        $searchTerm = '%' . $search . '%';
+        $stmt = $pdo->prepare("
+            SELECT p.id, p.name, p.price, p.image, c.name AS category_name
+            FROM products p
+            LEFT JOIN product_categories pc ON p.id = pc.product_id
+            LEFT JOIN categories c ON pc.category_id = c.id
+            WHERE p.name LIKE ?
+            ORDER BY p.id DESC
+        ");
+        $stmt->execute([$searchTerm]);
+    } else {
+        $stmt = $pdo->query("
+            SELECT p.id, p.name, p.price, p.image, c.name AS category_name
+            FROM products p
+            LEFT JOIN product_categories pc ON p.id = pc.product_id
+            LEFT JOIN categories c ON pc.category_id = c.id
+            ORDER BY p.id DESC
+        ");
+    }
+
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $message = "Error fetching products: " . $e->getMessage();
     $message_type = "error";
@@ -194,12 +207,47 @@ if (isset($_GET['message'])) {
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        .search-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            padding: 10px 15px;
+            background-color: #111;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .search-bar button:hover {
+            background-color: #333;
+        }
     </style>
 </head>
 
 <body>
 
     <h2>Product Management</h2>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <form action="product_manage.php" method="GET">
+            <input type="text" name="search" placeholder="Search product name..." value="<?php echo htmlspecialchars($search); ?>">
+            <button type="submit">Search</button>
+        </form>
+    </div>
 
     <!-- Display messages -->
     <?php if (!empty($message)): ?>
@@ -214,6 +262,7 @@ if (isset($_GET['message'])) {
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Category</th>
                 <th>Price</th>
                 <th>Image</th>
                 <th>Actions</th>
@@ -225,12 +274,11 @@ if (isset($_GET['message'])) {
                     <tr>
                         <td><?php echo htmlspecialchars($product['id']); ?></td>
                         <td><?php echo htmlspecialchars($product['name']); ?></td>
+                        <td><?php echo htmlspecialchars($product['category_name'] ?? 'No Category'); ?></td>
                         <td>RM <?php echo number_format($product['price'], 2); ?></td>
                         <td>
                             <?php if (!empty($product['image'])): ?>
-                                <img src="../products/<?php echo htmlspecialchars($product['image']); ?>"
-                                    alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                    class="product-image">
+                                <img src="../products/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image">
                             <?php else: ?>
                                 No image
                             <?php endif; ?>
@@ -239,14 +287,14 @@ if (isset($_GET['message'])) {
                             <a href="edit_product.php?id=<?php echo $product['id']; ?>">Edit</a>
                             <form action="product_manage.php" method="POST" style="display:inline;">
                                 <input type="hidden" name="delete_id" value="<?php echo $product['id']; ?>">
-                                <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this product and all its related data?');">Delete</button>
+                                <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?');">Delete</button>
                             </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="5">No products found</td>
+                    <td colspan="6">No products found</td>
                 </tr>
             <?php endif; ?>
         </tbody>

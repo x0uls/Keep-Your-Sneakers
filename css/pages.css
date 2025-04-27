@@ -149,32 +149,6 @@ h2 {
     background-color: #333;
 }
 
-.price-input {
-    position: relative;
-    width: 100%;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-}
-
-.price-input span {
-    position: absolute;
-    left: 10px;
-    top: 40%;
-    transform: translateY(-50%);
-    font-size: 14px;
-    color: #666;
-}
-
-.price-input input {
-    width: 100%;
-    padding: 10px 10px 10px 30px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    text-align: center;
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -202,3 +176,73 @@ h2 {
         font-size: 28px;
     }
 }
+
+.sidebar {
+    width: 200px;
+    min-width: 200px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    margin-right: 40px;
+    position: sticky;
+    top: 120px; /* Adjust this based on your header height */
+    max-height: calc(100vh - 140px); /* Prevent overflow */
+    overflow-y: auto; /* Enable scrolling if content is too long */
+}
+
+.price-input {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.price-input span {
+    position: absolute;
+    left: 10px;
+    top: 40%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #666;
+}
+
+.price-input input {
+    width: 100%;
+    padding: 10px 10px 10px 30px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 20px;
+}
+
+button[type="button"] {
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    background-color: #111;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+button[type="button"]:hover {
+    background-color: #333;
+}
+
+

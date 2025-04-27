@@ -15,11 +15,13 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // Fetch user details
-$stmt = $pdo->prepare("SELECT username, email, profile_picture FROM users WHERE id = :id");
+$stmt = $pdo->prepare("SELECT username, email, profile_picture, is_admin FROM users WHERE id = :id");
 $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $stmt->closeCursor();
+
+$is_admin = ($user['is_admin'] === 1);
 
 // Handle password change request
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
@@ -214,6 +216,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
             color: red;
             margin-top: 15px;
         }
+
+        /* Floating Admin Button */
+        .admin-dashboard-btn {
+            position: fixed;
+            bottom: 50px;
+            right: 20px;
+            background-color: #111;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .admin-dashboard-btn:hover {
+            background-color: #333;
+        }
+
+        /* Show button only for admin */
+        <?php if ($is_admin): ?>.admin-dashboard-btn {
+            display: block;
+        }
+
+        <?php endif; ?>
     </style>
 
 </head>
@@ -264,6 +295,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['change_password'])) {
                 <?php endif; ?>
             </div>
         </div>
+    </div>
+
+    <!-- Admin Dashboard Button -->
+    <div class="admin-dashboard-btn" onclick="window.location.href='../admin/admin_dashboard.php';">
+        Admin Dashboard
     </div>
 
     <?php include '../_foot.php'; ?>

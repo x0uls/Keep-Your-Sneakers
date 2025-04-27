@@ -32,11 +32,19 @@ class ProductFilter
     private function buildQuery()
     {
         try {
-            $sql = "SELECT p.* FROM products p 
+            // Start building the query
+            $sql = "SELECT p.*, c.name AS category_name FROM products p 
                     LEFT JOIN product_categories pc ON p.id = pc.product_id 
                     LEFT JOIN product_sizes ps ON p.id = ps.product_id 
-                    WHERE p.name LIKE :search";
+                    LEFT JOIN categories c ON pc.category_id = c.id 
+                    WHERE 1"; // This ensures that we always return products, even if no filter is applied
 
+            // Apply the search term if it's provided
+            if (!empty($this->search)) {
+                $sql .= " AND p.name LIKE :search";
+            }
+
+            // Apply price filters if present
             if ($this->min_price !== null && $this->max_price !== null) {
                 $sql .= " AND p.price BETWEEN :min_price AND :max_price";
             } elseif ($this->min_price !== null) {
@@ -45,23 +53,29 @@ class ProductFilter
                 $sql .= " AND p.price <= :max_price";
             }
 
+            // Apply category filter if present
             if ($this->category_id !== null) {
                 $sql .= " AND pc.category_id = :category_id";
             }
 
+            // Apply size filter if present
             if ($this->size_id !== null) {
                 $sql .= " AND ps.size_id = :size_id";
-            } else {
-                $sql .= " AND (ps.size_id IS NULL OR ps.size_id != 0)";
             }
 
+            // Order by price if no price range is set
             if ($this->min_price === null && $this->max_price === null) {
                 $sql .= " ORDER BY p.price ASC";
             }
 
+            // Prepare the SQL statement
             $stmt = $this->pdo->prepare($sql);
-            $searchTerm = "%" . $this->search . "%";
-            $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
+
+            // Bind parameters conditionally
+            if (!empty($this->search)) {
+                $searchTerm = "%" . $this->search . "%";
+                $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
+            }
 
             if ($this->min_price !== null && $this->max_price !== null) {
                 $stmt->bindParam(':min_price', $this->min_price);
@@ -80,12 +94,15 @@ class ProductFilter
                 $stmt->bindParam(':size_id', $this->size_id, PDO::PARAM_INT);
             }
 
+            // Execute the query
             $stmt->execute();
             $this->result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new Exception("Database error: " . $e->getMessage());
         }
     }
+
+
 
     private function loadCategories()
     {
