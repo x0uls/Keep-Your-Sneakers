@@ -122,18 +122,18 @@ function sendOrderConfirmationEmail($user_email, $order_id, $cart_items, $messag
     $mail = new PHPMailer(true);
 
     try {
-        //Server settings
+        // Server settings
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'liaw.casual@gmail.com';
-        $mail->Password   = 'buvq yftx klma vezl'; // App password
+        $mail->Password   = 'buvq yftx klma vezl';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
-        //Recipients
-        $mail->setFrom('noreply@yourdomain.com', 'Your Store');
-        $mail->addAddress($user_email); // User's email address
+        // Recipients
+        $mail->setFrom('noreply@KeepYourSneakers.com', 'Keep Your Sneakers');
+        $mail->addAddress($user_email);
 
         // Content
         $mail->isHTML(true);
@@ -145,42 +145,49 @@ function sendOrderConfirmationEmail($user_email, $order_id, $cart_items, $messag
             $total_price += $item['price'] * $item['quantity'];
         }
 
-        // Inline styles and HTML content
-        $bodyContent = "<html>
-                            <h1>Thank you for your order!</h1>
-                            <p>$message</p>
-                            <p><strong>Order ID:</strong> $order_id</p>
-                            <p><strong>Items:</strong></p><ul>";
+        // Start building HTML content
+        $html = '
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; }
+                .product { display: flex; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+                .product-details { flex: 1; }
+                .product-name { font-weight: bold; }
+                .product-price { text-align: right; font-weight: bold; }
+                .total { font-size: 18px; font-weight: bold; margin-top: 20px; }
+            </style>
+        </head>
+        <body>
+            <h1>Thank you for your order!</h1>
+            <p>' . $message . '</p>
+            <p><strong>Order ID:</strong> ' . $order_id . '</p>
+            <h2>Order Details</h2>';
 
-        // Add cart items to the email body
+        // Add cart items (no image)
         foreach ($cart_items as $item) {
-            // Generate a unique CID for each image
-            $cid = md5($item['image']);
-
-            // Embed the image into the email using the unique CID
-            $mail->addEmbeddedImage($_SERVER['DOCUMENT_ROOT'] . '/products/' . $item['image'], $cid);
-
-            // Add the product details with the embedded image in the email body
-            $bodyContent .= "<li>
-                                  <div>
-                                      <img src='cid:$cid' alt='Product' style='width: 60px;'>
-                                      <div>
-                                          <div><strong>{$item['quantity']} x {$item['product_name']}</strong></div>
-                                          <div>Size: {$item['size_label']}</div>
-                                          <div>RM" . number_format($item['price'], 2) . "</div>
-                                      </div>
-                                  </div>
-                                  <div style='text-align: right; font-weight: 600;'>RM" . number_format($item['price'] * $item['quantity'], 2) . "</div>
-                              </li>";
+            $html .= '
+            <div class="product">
+                <div class="product-details">
+                    <div class="product-name">' . $item['quantity'] . ' × ' . $item['product_name'] . '</div>
+                    <div>Size: ' . $item['size_label'] . '</div>
+                    <div>Price: RM' . number_format($item['price'], 2) . ' each</div>
+                </div>
+                <div class="product-price">RM' . number_format($item['price'] * $item['quantity'], 2) . '</div>
+            </div>';
         }
 
+        $html .= '
+            <div class="total">
+                <hr>
+                <div style="text-align: right;">
+                    <strong>Total: RM' . number_format($total_price, 2) . '</strong>
+                </div>
+            </div>
+        </body>
+        </html>';
 
-
-        $bodyContent .= "</ul><hr><p><strong>Total: RM" . number_format($total_price, 2) . "</strong></p></div></body></html>";
-
-        $mail->Body = $bodyContent;
-
-        // Send email
+        $mail->Body = $html;
         $mail->send();
     } catch (Exception $e) {
         error_log('Error sending email: ' . $mail->ErrorInfo);
